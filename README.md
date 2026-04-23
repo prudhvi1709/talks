@@ -17,3 +17,9 @@
 - **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/Hydpy-20-12-2025/index.html)
 - **Video:** https://www.youtube.com/watch?v=nclyldi9b0Q
 - **Transcript:** [Read Transcript](https://prudhvi1709.github.io/talks/Hydpy-20-12-2025/transcript-hydpy.md)
+
+### IDC Hyderabad Workshop - Apr 25, 2026
+**Title:** Build and Ship: Applied AI in Action
+
+- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/IDC-25-04-2026/idc-workshop.html)
+- **Event:** Offline Community Connect · IDC Hyderabad

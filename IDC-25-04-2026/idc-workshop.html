@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build and Ship: Applied AI in Action — IDC Workshop</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/theme/white.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    :root {
+      --primary: #2c3e50;
+      --headline: #1a252f;
+      --secondary: #34495e;
+      --accent: #e74c3c;
+      --blue: #3498db;
+      --bg: #fafbfc;
+      --code-bg: #f1f3f4;
+      --green: #27ae60;
+      --light-border: #e0e4e8;
+    }
+
+    .reveal {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: var(--bg);
+      color: var(--primary);
+    }
+
+    .reveal h1 { font-size: 3.2rem; font-weight: 700; color: var(--headline); line-height: 1.2; text-align: center; }
+    .reveal h2 { font-size: 2.2rem; font-weight: 600; color: var(--headline); text-align: center; }
+    .reveal h3 { font-size: 1.6rem; font-weight: 600; color: var(--secondary); text-align: center; }
+    .reveal p, .reveal li { font-size: 1.5rem; color: var(--primary); line-height: 1.6; }
+    .reveal p { text-align: center; }
+    .reveal ul { list-style: none; padding: 0; }
+    .reveal ul li::before { content: "→ "; color: var(--accent); font-weight: 700; }
+    .reveal a { color: var(--blue); }
+
+    .accent { color: var(--accent); }
+    .blue { color: var(--blue); }
+    .green { color: var(--green); }
+    .muted { opacity: 0.6; font-size: 1.1rem; }
+    .big { font-size: 2.4rem; font-weight: 700; color: var(--headline); }
+    .huge { font-size: 3.8rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+    .rule-text { font-size: 2.8rem; font-weight: 700; color: var(--headline); line-height: 1.4; text-align: center; }
+
+    /* Tag / pill */
+    .tag {
+      display: inline-block;
+      background: var(--code-bg);
+      border: 1px solid var(--light-border);
+      border-radius: 6px;
+      padding: 4px 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--secondary);
+      margin: 4px;
+    }
+    .tag.red { background: #fdecea; border-color: #e74c3c; color: #c0392b; }
+    .tag.blue { background: #eaf4fb; border-color: #3498db; color: #2980b9; }
+    .tag.green { background: #eafaf1; border-color: #27ae60; color: #1e8449; }
+
+    /* Three column layout */
+    .cols {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .col { flex: 1; }
+    .col-card {
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      height: 100%;
+    }
+    .col-card h3 { margin: 0 0 0.8rem 0; font-size: 1.3rem; }
+    .col-card ul li { font-size: 1.08rem; margin-bottom: 0.7rem; line-height: 1.45; }
+    .col-card ul li::before { content: "· "; color: var(--accent); }
+
+    /* Lesson list */
+    .lesson-list { list-style: none; padding: 0; margin: 0; }
+    .lesson-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 0.6rem;
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 10px;
+      font-size: 1.35rem;
+    }
+    .lesson-list li::before { content: none; }
+    .lesson-num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 2rem;
+    }
+
+    /* Tool card */
+    .tool-grid {
+      display: flex;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .tool-card {
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 12px;
+      padding: 1.2rem 2rem;
+      min-width: 260px;
+      text-align: center;
+    }
+    .tool-card .tool-name { font-size: 1.4rem; font-weight: 700; color: var(--headline); margin-bottom: 0.3rem; }
+    .tool-card .tool-desc { font-size: 1rem; color: var(--secondary); }
+    .tool-card .tool-link { font-size: 1rem; color: var(--blue); margin-top: 0.4rem; }
+
+    /* Round slide */
+    .round-box {
+      background: white;
+      border: 2px solid var(--light-border);
+      border-radius: 16px;
+      padding: 2.5rem 3rem;
+      text-align: center;
+      margin: 1rem auto;
+      max-width: 800px;
+    }
+    .round-box .round-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.6rem;
+    }
+    .round-box .round-goal { font-size: 2rem; font-weight: 700; color: var(--headline); margin-bottom: 1rem; }
+    .round-box .round-time { font-size: 1.1rem; color: var(--secondary); }
+    .timeline {
+      position: relative;
+      max-width: 1120px;
+      margin: 0.4rem auto 0;
+      padding-left: 3.5rem;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 1.2rem;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      width: 4px;
+      background: linear-gradient(180deg, #60a5fa 0%, #e76f51 34%, #4caf6a 68%, #fdba74 100%);
+      border-radius: 999px;
+    }
+    .timeline-step {
+      position: relative;
+      margin-bottom: 1rem;
+      padding: 1rem 1.3rem 1rem 1.4rem;
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 16px;
+      text-align: left;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+    }
+    .timeline-step::before {
+      content: "";
+      position: absolute;
+      left: -2.9rem;
+      top: 1.45rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: white;
+      border: 4px solid currentColor;
+      box-sizing: border-box;
+    }
+    .timeline-step.blue { color: #4a90e2; }
+    .timeline-step.red { color: #e76f51; }
+    .timeline-step.green { color: #4caf6a; }
+    .timeline-step.gold { color: #f59e0b; }
+    .timeline-step .step-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .timeline-step .step-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: currentColor;
+    }
+    .timeline-step .step-time {
+      font-size: 1rem;
+      font-weight: 700;
+      color: currentColor;
+    }
+    .timeline-step .step-goal {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--headline);
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+    .timeline-step .step-copy {
+      font-size: 1.02rem;
+      color: var(--secondary);
+      line-height: 1.45;
+    }
+    .timeline-closeout {
+      margin-top: 1.15rem;
+      padding: 1rem 1.3rem;
+      background: linear-gradient(135deg, #fff7ed 0%, #fffaf3 100%);
+      border: 1.5px solid #fdba74;
+      border-radius: 16px;
+      text-align: left;
+      box-shadow: 0 10px 26px rgba(245, 158, 11, 0.08);
+    }
+    .timeline-closeout .closeout-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c2410c;
+      margin-bottom: 0.35rem;
+    }
+    .timeline-closeout .closeout-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--headline);
+      margin-bottom: 0.25rem;
+    }
+    .timeline-closeout .closeout-copy {
+      font-size: 1.02rem;
+      color: var(--secondary);
+      line-height: 1.45;
+    }
+
+    /* Demo card row */
+    .demo-row {
+      display: flex;
+      gap: 1.6rem;
+      justify-content: center;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .demo-card {
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 12px;
+      padding: 1.6rem;
+      flex: 1;
+      text-align: center;
+    }
+    .demo-card .demo-emoji { font-size: 2.8rem; margin-bottom: 0.6rem; }
+    .demo-card .demo-title { font-size: 1.2rem; font-weight: 700; color: var(--headline); margin-bottom: 0.4rem; }
+    .demo-card .demo-desc { font-size: 1rem; color: var(--secondary); }
+
+    /* Close slide */
+    .close-grid {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      margin: 1rem auto 0;
+      max-width: 1100px;
+    }
+    .close-link {
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 10px;
+      padding: 0.8rem 1.6rem;
+      font-size: 1.1rem;
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    /* Divider line */
+    .divider { width: 60px; height: 4px; background: var(--accent); border-radius: 2px; margin: 0.8rem auto 1.2rem; }
+
+    /* QR placeholder */
+    .qr-box {
+      width: 160px;
+      height: 160px;
+      background: var(--code-bg);
+      border: 2px dashed var(--light-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: var(--secondary);
+      text-align: center;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .hero-qr {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      background: white;
+      border: 1.5px solid var(--light-border);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+    .hero-qr img {
+      width: 96px;
+      height: 96px;
+      display: block;
+      border-radius: 8px;
+      background: white;
+    }
+    .hero-qr-copy {
+      text-align: left;
+    }
+    .hero-qr-copy .label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    .hero-qr-copy .title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--headline);
+      margin-bottom: 0.2rem;
+    }
+    .hero-qr-copy .link {
+      font-size: 0.95rem;
+      color: var(--secondary);
+      word-break: break-all;
+    }
+
+    .reveal section { padding: 20px 32px; text-align: center; }
+
+    /* Keep card and list content left-aligned */
+    .col-card { text-align: left; }
+    .col-card h3 { text-align: left; }
+    .lesson-list {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .lesson-list li { text-align: left; }
+    .tool-card { text-align: center; }
+    .round-box { text-align: center; }
+    .demo-card { text-align: center; }
+    .idea-hint {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: var(--secondary);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SLIDE 1: TITLE -->
+    <section>
+      <p class="muted" style="margin-bottom: 0.2rem;">Offline Community Connect · IDC Hyderabad</p>
+      <h1>Build and Ship:<br/><span class="accent">Applied AI in Action</span></h1>
+      <div class="divider"></div>
+      <p style="font-size: 1.4rem; color: var(--secondary);">Build a working AI app. Share the link. That's it.</p>
+      <br/>
+      <p style="font-size: 1.2rem; color: var(--secondary);">
+        <strong style="color: var(--headline);">Prudhvi Krovvidi</strong> &nbsp;·&nbsp; Data Scientist @ Gramener
+        &nbsp;·&nbsp; <a href="https://github.com/prudhvi1709">github.com/prudhvi1709</a>
+      </p>
+      <p class="muted">25th Apr 2026 &nbsp;|&nbsp; 10:30 AM</p>
+      <div class="hero-qr">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=https%3A%2F%2Fprudhvi1709.github.io%2Ftalks%2FIDC-25-04-2026%2Fidc-workshop.html"
+          alt="QR code for IDC workshop slides"
+        />
+        <div class="hero-qr-copy">
+          <div class="label">Scan To Open</div>
+          <div class="title">Workshop Slides</div>
+          <div class="link">prudhvi1709.github.io/talks/IDC-25-04-2026/idc-workshop.html</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: THE ONLY RULE -->
+    <section>
+      <h2>One Rule</h2>
+      <div class="divider"></div>
+      <br/>
+      <div class="rule-text">
+        "By the time we finish,<br/>
+        paste <span class="accent">one link</span><br/>
+        in the group."
+      </div>
+      <br/>
+      <div class="qr-box">
+        WhatsApp Group<br/>QR Code<br/><span style="font-size:0.75rem">(replace before event)</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: WHAT'S POSSIBLE -->
+    <section>
+      <h2>What's Possible in 2 Hours</h2>
+      <div class="divider"></div>
+      <div class="demo-row">
+        <div class="demo-card">
+          <div class="demo-emoji">🧪</div>
+          <div class="demo-title">HypoForge</div>
+          <div class="demo-desc">Upload data. AI generates hypotheses. Stats validates them. Zero backend.</div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-emoji">🔓</div>
+          <div class="demo-title">Jailbreak Arena</div>
+          <div class="demo-desc">A game where you craft prompts to break an LLM. Built for PyCon 2026.</div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-emoji">⚡</div>
+          <div class="demo-title">Built Live</div>
+          <div class="demo-desc">Idea → working app in under 5 minutes. You just watched it happen.</div>
+        </div>
+      </div>
+      <br/>
+      <p class="muted">These were all built by one person. Today you build yours.</p>
+    </section>
+
+    <!-- SLIDE 4: TOOLS -->
+    <section>
+      <h2>Your Toolkit — All Free</h2>
+      <div class="divider"></div>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-name">aipipe</div>
+          <div class="tool-desc">Free LLM API access.<br/>No credit card needed.</div>
+          <div class="tool-link">aipipe.org</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name">Claude Artifacts</div>
+          <div class="tool-desc">Build and run apps<br/>directly in the browser.</div>
+          <div class="tool-link">claude.ai</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name">ChatGPT</div>
+          <div class="tool-desc">Free tier works.<br/>Great for quick prototypes.</div>
+          <div class="tool-link">chatgpt.com</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name">Gemini</div>
+          <div class="tool-desc">Canvas mode lets you<br/>build and iterate fast.</div>
+          <div class="tool-link">gemini.google.com</div>
+        </div>
+      </div>
+      <br/>
+      <p class="muted">Nothing to install. Everything runs in your browser.</p>
+    </section>
+
+    <!-- SLIDE 5: IDEA ACCELERATORS — stays on screen during ideation + building -->
+    <section>
+      <h2>Idea Accelerators</h2>
+      <div class="divider"></div>
+      <p class="muted" style="font-size: 1rem; margin-bottom: 1.1rem;">
+        Don't build a generic chatbot. Pick one messy input, one sharp user, one surprising output.
+      </p>
+      <div class="cols">
+        <div class="col">
+          <div class="col-card">
+            <h3 style="color: var(--blue);">Use Your Own Data</h3>
+            <ul>
+              <li>Bank statement → money story</li>
+              <li>Calendar + deadlines → student cockpit</li>
+              <li>Screen time / health logs → behavior mirror</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col">
+          <div class="col-card">
+            <h3 style="color: var(--accent);">Use A Live Signal</h3>
+            <ul>
+              <li>Camera → posture or drowsiness coach</li>
+              <li>Voice / journal → dream or mood mapper</li>
+              <li>Location / meetings → timely assistant</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col">
+          <div class="col-card">
+            <h3 style="color: var(--green);">Make It Weird Enough To Share</h3>
+            <ul>
+              <li>Text / diary → soundtrack or trailer</li>
+              <li>Group chat → roast or memory map</li>
+              <li>Unread PDF → visual explainer</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="idea-hint">Best prompts start with: "Take this input, do one smart thing, return something I can use or share."</p>
+      <aside class="notes">
+        Push them away from generic chatbots and toward specific transformations.
+        Good examples to mention if the room is blank:
+        bank statement to spending story, savings leaks, and monthly advice.
+        class schedule plus deadlines into a student dashboard.
+        screen time, Netflix, YouTube, or health logs into a behavior mirror.
+        camera into a posture checker or drowsy-driver alert.
+        voice note or dream journal into a mood map or dream interpreter.
+        location into an arrival alarm or neighborhood memory guide.
+        meeting transcript into actions, blockers, and risk summary.
+        text into music, ambience, or a fake trailer.
+        WhatsApp group into a roast generator or inside-joke map.
+        boring PDF into a visual explainer.
+        If they are stuck, ask:
+        what data do you already have,
+        what signal can you capture live,
+        what would be funny enough or useful enough to share in the group today.
+      </aside>
+    </section>
+
+    <!-- SLIDE 6: FIVE THINGS -->
+    <section>
+      <h2>Five Things That Actually Help</h2>
+      <div class="divider"></div>
+      <ul class="lesson-list">
+        <li>
+          <span class="lesson-num">1</span>
+          <span><strong>Plan before you prompt.</strong> Three sentences about what you're building saves 30 minutes of fixing.</span>
+        </li>
+        <li>
+          <span class="lesson-num">2</span>
+          <span><strong>One thing at a time.</strong> One big prompt breaks everything. Three small ones build something.</span>
+        </li>
+        <li>
+          <span class="lesson-num">3</span>
+          <span><strong>Read what it generates.</strong> Code that looks right and code that is right look identical. Until they don't.</span>
+        </li>
+        <li>
+          <span class="lesson-num">4</span>
+          <span><strong>Test before adding more.</strong> The whack-a-mole problem is real. Build 20 lines, test, then continue.</span>
+        </li>
+        <li>
+          <span class="lesson-num">5</span>
+          <span><strong>Imagination is now the bottleneck.</strong> Not your ability to code. Knowing what to build is the hard part.</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- SLIDE 7: BUILD ROUNDS — update live as rounds progress -->
+    <section>
+      <h2>The Build</h2>
+      <div class="divider"></div>
+      <div class="timeline">
+        <div class="timeline-step blue">
+          <div class="step-top">
+            <div class="step-label">Round 1</div>
+            <div class="step-time">15 min</div>
+          </div>
+          <div class="step-goal">Pick the idea. Scope it down.</div>
+          <div class="step-copy">One user. One input. One output. Start smaller than you want.</div>
+        </div>
+        <div class="timeline-step red">
+          <div class="step-top">
+            <div class="step-label">Round 2</div>
+            <div class="step-time">25 min</div>
+          </div>
+          <div class="step-goal">Get version one working.</div>
+          <div class="step-copy">Ugly is fine. Broken edges are fine. Make the core loop work.</div>
+        </div>
+        <div class="timeline-step green">
+          <div class="step-top">
+            <div class="step-label">Round 3</div>
+            <div class="step-time">20 min</div>
+          </div>
+          <div class="step-goal">Add one thing that feels smart.</div>
+          <div class="step-copy">Use your data, a live signal, or a better output. Not all three.</div>
+        </div>
+        <div class="timeline-step gold">
+          <div class="step-top">
+            <div class="step-label">Round 4</div>
+            <div class="step-time">20 min</div>
+          </div>
+          <div class="step-goal">Polish, test, publish.</div>
+          <div class="step-copy">Fix obvious bugs. Add a short intro. Get a link you can share confidently.</div>
+        </div>
+        <div class="timeline-closeout">
+          <div class="closeout-label">Final 20 Min</div>
+          <div class="closeout-title">Demo, debrief, Q&amp;A.</div>
+          <div class="closeout-copy">Share links. Talk about what worked, what broke, what surprised you, and what you would do next.</div>
+        </div>
+      </div>
+      <aside class="notes">
+        This is the 100-minute build window inside a 2-hour workshop.
+        The remaining time is for opening context, tool setup, and transitions.
+        Keep pushing them to ship by Round 4.
+        In the final 20 minutes, prioritize:
+        one-line demo from each person or team,
+        one lesson learned,
+        one thing they would improve next,
+        then open Q and A.
+      </aside>
+    </section>
+
+    <!-- SLIDE 8: CLOSE -->
+    <section>
+      <h2>Look at That Group Chat</h2>
+      <div class="divider"></div>
+      <br/>
+      <p class="rule-text" style="font-size: 2rem;">
+        Every link in there was built today,<br/>
+        by someone who walked in without a plan.
+      </p>
+      <br/>
+      <p class="rule-text" style="font-size: 1.5rem; color: var(--secondary);">
+        That is what building with AI looks like.
+      </p>
+      <br/>
+      <div class="close-grid">
+        <a class="close-link" href="https://github.com/prudhvi1709">github.com/prudhvi1709</a>
+        <a class="close-link" href="https://github.com/prudhvi1709/talks">All my talks</a>
+        <span class="close-link" style="color: var(--secondary);">kprudhvi71@gmail.com</span>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1400,
+    height: 900,
+    transition: 'slide',
+    controls: true,
+    progress: true,
+    center: true,
+    hash: true,
+    plugins: [RevealNotes]
+  });
+</script>
+</body>
+</html>
