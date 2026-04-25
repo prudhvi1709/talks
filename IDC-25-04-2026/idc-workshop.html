@@ -288,61 +288,70 @@
     /* Divider line */
     .divider { width: 60px; height: 4px; background: var(--accent); border-radius: 2px; margin: 0.8rem auto 1.2rem; }
 
-    /* QR placeholder */
+    /* QR block */
     .qr-box {
       width: 160px;
       height: 160px;
-      background: var(--code-bg);
-      border: 2px dashed var(--light-border);
+      background: white;
+      border: 1.5px solid var(--light-border);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
-      color: var(--secondary);
-      text-align: center;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 0.5rem;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
     }
     .hero-qr {
       display: inline-flex;
       align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      padding: 0.9rem 1rem;
-      background: white;
-      border: 1.5px solid var(--light-border);
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      gap: 1.25rem;
+      margin-top: 1.2rem;
+      padding: 1.1rem 1.25rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(234,244,251,.96) 100%);
+      border: 1.5px solid #d7e6f2;
+      border-radius: 20px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.10);
     }
     .hero-qr img {
-      width: 96px;
-      height: 96px;
+      width: 148px;
+      height: 148px;
       display: block;
-      border-radius: 8px;
+      border-radius: 16px;
       background: white;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      padding: 0.3rem;
     }
     .hero-qr-copy {
       text-align: left;
+      max-width: 320px;
     }
     .hero-qr-copy .label {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.35rem;
     }
     .hero-qr-copy .title {
-      font-size: 1.15rem;
+      font-size: 1.35rem;
       font-weight: 700;
       color: var(--headline);
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.35rem;
     }
     .hero-qr-copy .link {
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--secondary);
       word-break: break-all;
+      line-height: 1.45;
     }
 
     .reveal section { padding: 20px 32px; text-align: center; }
@@ -384,7 +393,7 @@
       <p class="muted">25th Apr 2026 &nbsp;|&nbsp; 10:30 AM</p>
       <div class="hero-qr">
         <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=https%3A%2F%2Fprudhvi1709.github.io%2Ftalks%2FIDC-25-04-2026%2Fidc-workshop.html"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=https%3A%2F%2Fprudhvi1709.github.io%2Ftalks%2FIDC-25-04-2026%2Fidc-workshop.html"
           alt="QR code for IDC workshop slides"
         />
         <div class="hero-qr-copy">
@@ -394,25 +403,15 @@
         </div>
       </div>
       <aside class="notes">
-        Opening frame:
-        This is not a talk where they watch you build.
-        This is a workshop where they ship something.
-        The bar is not production-ready.
-        The bar is one real link that does one useful or interesting thing.
-        If it is ugly but works, that counts as a win.
+        Welcome everyone. This is not a session where you watch me build something and then clap at the end. This is a working session where you build something and ship it.
 
-        Establish the constraint immediately:
-        one user, one input, one output.
-        Ambition is the main failure mode in a 2-hour workshop.
+        My name is Prudhvi. I’m a Data Scientist at Gramener, and I spend a lot of my time building practical AI workflows and prototypes. But today is not really about my background. Today is about making sure each of you builds something real and shares a link before we leave.
 
-        Preflight before people settle:
-        open the hosted slides and local backup,
-        keep claude.ai, chatgpt.com, gemini.google.com, and aipipe.org ready in tabs,
-        keep one tiny backup demo idea ready:
-        bank statement to spending story,
-        PDF to visual explainer,
-        meeting notes to actions and risks,
-        diary to mood map.
+        The bar today is not production-ready. The bar is one real link that does one useful, interesting, or funny thing. If it is ugly but it works, that still counts as a win.
+
+        I want you to remember one constraint through the whole workshop: one user, one input, one output. The fastest way to fail in a two-hour session is to make the idea too ambitious.
+
+        Keep these slides open. I also have backup tools ready if anything breaks. If you get stuck later, I will help you cut scope, simplify the app, and get you to a working version.
       </aside>
     </section>
 
@@ -428,17 +427,16 @@
       </div>
       <br/>
       <div class="qr-box">
-        WhatsApp Group<br/>QR Code<br/><span style="font-size:0.75rem">(replace before event)</span>
+        <img src="whatsapp-group-qr.jpeg" alt="WhatsApp group QR code" />
       </div>
       <aside class="notes">
-        Pause on this slide.
-        Make them join the group now, not later.
-        Say this clearly:
-        by the end of the workshop the only success metric is a link posted in the group.
-        Everything else is secondary.
+        Pause here and make this concrete. Please join the WhatsApp group right now, not later.
 
-        Also keep the group invite as plain text.
-        Do not rely only on the QR.
+        By the end of this workshop, the only metric that matters is this: you post one working link in that group. Everything else is secondary.
+
+        If your app is simple, that is fine. If the UI is rough, that is fine. If it solves one narrow problem and you can share it, you have succeeded.
+
+        I will also share the group link as text, because I do not want anyone blocked just because the QR did not scan.
       </aside>
     </section>
 
@@ -466,16 +464,13 @@
       <br/>
       <p class="muted">These were all built by one person. Today you build yours.</p>
       <aside class="notes">
-        Use this to make the workshop feel achievable, not intimidating.
-        Keep examples fast.
-        The message is:
-        this is enough time to build something specific and real,
-        but not enough time to build a platform.
+        I’m showing these examples for one reason: to make this feel achievable, not intimidating.
 
-        Minute 10 to 20:
-        ask for a show of hands for who already has an idea.
-        Walk the room and force every person or team to describe their app as:
-        for [user], take [input], produce [output].
+        You have enough time today to build something specific and real. You do not have enough time to build a platform, a startup, or a full product suite.
+
+        In the next few minutes, I want each person or team to define their app in one sentence like this: for this user, take this input, and produce this output.
+
+        If you already have an idea, great. If you do not, that is normal. We’ll fix that quickly by shrinking the problem until it becomes buildable.
       </aside>
     </section>
 
@@ -508,21 +503,13 @@
       <br/>
       <p class="muted">Nothing to install. Everything runs in your browser.</p>
       <aside class="notes">
-        Move fast here.
-        The point is not tool comparison.
-        The point is to remove excuses about setup friction.
-        Tell them to pick the tool they can move fastest in and start.
+        I’m not doing a detailed tool comparison here. The point is simpler: you already have enough to start building, and you do not need to install anything complicated.
 
-        If live APIs are flaky or people get blocked:
-        switch to pasted text instead of file upload,
-        switch to sample data instead of real data,
-        switch from real-time to analyze-after-submit,
-        switch from full app to artifact or prototype.
+        Pick the tool that lets you move fastest and start. Do not lose twenty minutes comparing models, interfaces, or tiny differences in quality.
 
-        Priority order:
-        preserve the core transformation,
-        preserve the shareable link,
-        drop everything else.
+        If something breaks, simplify immediately. Use pasted text instead of file upload. Use sample data instead of real data. Use a prototype instead of a full app.
+
+        The priority order is very simple: preserve the core transformation, preserve the shareable link, and cut everything else.
       </aside>
     </section>
 
@@ -567,36 +554,15 @@
       </div>
       <p class="idea-hint">Best prompts start with: "Take this input, do one smart thing, return something I can use or share."</p>
       <aside class="notes">
-        Push them away from generic chatbots and toward specific transformations.
-        Good examples to mention if the room is blank:
-        bank statement to spending story, savings leaks, and monthly advice.
-        class schedule plus deadlines into a student dashboard.
-        screen time, Netflix, YouTube, or health logs into a behavior mirror.
-        camera into a posture checker or drowsy-driver alert.
-        voice note or dream journal into a mood map or dream interpreter.
-        location into an arrival alarm or neighborhood memory guide.
-        meeting transcript into actions, blockers, and risk summary.
-        text into music, ambience, or a fake trailer.
-        WhatsApp group into a roast generator or inside-joke map.
-        boring PDF into a visual explainer.
-        If they are stuck, ask:
-        what data do you already have,
-        what signal can you capture live,
-        what would be funny enough or useful enough to share in the group today.
+        This is where I want to push you away from generic chatbot ideas and toward specific transformations.
 
-        If they still have no idea:
-        ask what repeated task annoys them every week,
-        what file they never read but should,
-        or what would be funny enough to show this room today.
+        A good idea for today looks like this: take one messy input, do one smart thing, and return one output that is useful or shareable.
 
-        If the idea is too big, say:
-        cut it to one screen, one flow, one output.
+        If you are stuck, ask yourself three questions. What data do I already have? What live signal can I capture? What would be useful enough or funny enough to share in the group today?
 
-        Force rewrites like:
-        career assistant to resume bullet improver,
-        study platform to PDF to quiz generator,
-        fitness coach to workout log to weekly summary,
-        finance advisor to bank CSV to spending categories.
+        If your idea still feels vague, shrink it aggressively. Do not build a career assistant. Build a resume bullet improver. Do not build a study platform. Build a PDF-to-quiz generator. Do not build a finance advisor. Build a bank CSV to spending categories app.
+
+        For today, one screen, one flow, and one output is enough.
       </aside>
     </section>
 
@@ -627,26 +593,15 @@
         </li>
       </ul>
       <aside class="notes">
-        This is the operating manual for the room.
-        Emphasize 1, 2, and 4:
-        plan before prompting,
-        do one thing at a time,
-        test before adding more.
-        If people start flailing later, come back to these rules.
+        These are the rules that will keep the room moving.
 
-        Prompt pattern to give participants:
+        First, plan before you prompt. Spend three minutes writing down what the app does before you ask an AI tool to generate anything.
 
-        Build a very small web app.
-        User: [who this is for]
-        Input: [the one thing they provide]
-        Output: [the one thing the app returns]
-        Constraints:
-        single page,
-        minimal clean UI,
-        no auth,
-        no database unless absolutely necessary,
-        make the core flow work first.
-        Build the simplest working version, then stop and ask what to improve next.
+        Second, do one thing at a time. One giant prompt usually creates a giant mess. Small steps are slower for one minute and faster for the next hour.
+
+        Third, read the code and test it before you add more. Build a small piece, run it, check it, and only then move on.
+
+        If you need a prompt template, use this: build a very small web app for this user, take this input, return this output, keep it single-page, keep the UI minimal, skip auth, skip database unless absolutely necessary, make the core flow work first, and then stop for review.
       </aside>
     </section>
 
@@ -694,45 +649,17 @@
         </div>
       </div>
       <aside class="notes">
-        This is the 100-minute build window inside a 2-hour workshop.
-        The remaining time is for opening context, tool setup, and transitions.
-        Keep pushing them to ship by Round 4.
-        In the final 20 minutes, prioritize:
-        one-line demo from each person or team,
-        one lesson learned,
-        one thing they would improve next,
-        then open Q and A.
+        This is the structure for the build window, and I want you to follow it instead of improvising your own timeline.
 
-        Facilitation by round:
+        In round one, pick the idea and cut scope. Before you prompt anything, write the app in three sentences: who it is for, what goes in, and what comes out.
 
-        Round 1:
-        check that each team has written a 3-sentence spec before prompting.
-        Kill vague ideas early.
+        In round two, get version one working. Ignore polish. Ignore branding. Ignore fancy extras. Just make the core loop work.
 
-        Round 2:
-        goal is a working version one.
-        If they are styling too early, stop them.
-        Ask:
-        what is the core loop,
-        what is the smallest believable version,
-        what can you delete right now.
+        In round three, add one thing that feels smart. One better output, one better prompt, one real dataset, or one useful visualization. Not all of them.
 
-        Round 3:
-        push for one smart moment only.
-        Better prompt quality, real uploaded data, stronger output format,
-        or one useful visualization.
-        Not all of them.
+        In round four, polish, test, and publish. Add a title, add one-line description, make sure it works, and get the link ready to share.
 
-        Round 4:
-        make them publish, test, add a title, and write a one-line description.
-        Start collecting links before the final shareout.
-
-        If a build keeps breaking:
-        remove auth,
-        remove database,
-        remove multi-page UI,
-        hardcode sample data if necessary,
-        make the LLM call work first and rebuild outward.
+        If your build keeps failing, cut aggressively: remove auth, remove the database, remove extra pages, hardcode sample data if needed, and rebuild around the simplest working flow.
       </aside>
     </section>
 
@@ -756,25 +683,15 @@
         <span class="close-link" style="color: var(--secondary);">kprudhvi71@gmail.com</span>
       </div>
       <aside class="notes">
-        End on the participants, not on yourself.
-        The punchline is that ordinary people in the room shipped something real in one session.
-        That is the proof point.
-        Keep Q and A short if demos are running long.
+        End on the participants, not on me.
 
-        Final debrief angle:
-        AI reduces build friction, but does not remove the need for judgment.
-        Scope discipline is the difference between shipping and stalling.
-        The people who ship fastest usually choose the simplest idea,
-        not the smartest-sounding one.
+        The point of this workshop is that ordinary people walked into this room and shipped something real in one session. That is the proof. That is what matters.
 
-        After the workshop:
-        save the best links,
-        note which ideas got traction,
-        write down where people got stuck:
-        ideation,
-        prompting,
-        debugging,
-        publishing.
+        The big takeaway is not that AI magically builds everything for you. The real takeaway is that AI reduces build friction, but judgment still matters. Scope discipline is still the difference between shipping and stalling.
+
+        The people who ship fastest are usually not the people with the biggest ideas. They are the people who choose the simplest idea that can still be shared.
+
+        Let’s look at what got built, what broke, what surprised you, and what you would do next if you had one more hour.
       </aside>
     </section>
 
