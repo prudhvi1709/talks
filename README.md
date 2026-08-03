@@ -4,6 +4,13 @@
 
 ## Presentations
 
+### Straive Convergence - 2026
+**Title:** AI Works For Me
+
+- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/ai-works-for-me/)
+- **Video:** Not available yet
+- **Transcript:** Not available yet
+
 ### IDC Hyderabad Workshop - Apr 25, 2026
 **Title:** Build and Ship: Applied AI in Action
 
