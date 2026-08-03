@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Works For Me</title>
+
+    <!-- Reveal.js core (vendored, offline-safe) -->
+    <link rel="stylesheet" href="vendor/reveal.css">
+
+    <style>
+      /* -------------------------------------------------------------------
+         Apple / Steve Jobs keynote style (Anand Madhav = the craft).
+         One idea per screen, no bullet points, screen is the backdrop.
+
+         Structure (mixing both Anands):
+           Part 1 (~2 min): the personal story  -> slides 1-4
+           Part 2 (~4 min): how AI worked for me -> slides 5-10
+             = feedback loop + "AI works for me / I work for AI" assets
+               + StraiveX methodology + human-in-the-loop + compounding
+             (Anand S = the substance)
+
+         Charts are generated from a data series so they read as real,
+         Fitbit-synced data. Search EDIT: for values you may want to change.
+      ------------------------------------------------------------------- */
+      :root {
+        --bg: #050608;
+        --fg: #f5f5f7;
+        --dim: #86868b;
+        --line: #23252b;
+        --up: #ff5f56;
+        --down: #30d158;
+        --gold: #f5a623;
+        --cyan: #4cc2ff;
+
+        /* Reveal 5 theme variables (no theme file loaded) */
+        --r-background-color: #050608;
+        --r-main-color: #f5f5f7;
+        --r-heading-color: #f5f5f7;
+        --r-link-color: #f5a623;
+        --r-link-color-hover: #ffbf4d;
+        --r-selection-background-color: #f5a623;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { background: var(--bg); color: var(--fg); }
+      .reveal-viewport, .reveal .backgrounds { background-color: var(--bg) !important; }
+
+      .reveal {
+        font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--fg);
+        letter-spacing: -0.01em;
+      }
+      .reveal .slides { text-align: center; }
+      .reveal h1, .reveal h2, .reveal p { color: var(--fg); text-transform: none; }
+
+      .big  { margin: 0; font-weight: 700; font-size: clamp(42px, 8vw, 118px); line-height: 0.98; }
+      .huge { margin: 0; font-weight: 800; font-size: clamp(80px, 20vw, 280px); line-height: 0.9; letter-spacing: -0.03em; }
+      .sub  { margin: 26px 0 0; font-weight: 500; font-size: clamp(20px, 3.2vw, 40px); color: var(--dim); line-height: 1.18; }
+      .eyebrow { margin: 0 0 34px; font-size: clamp(12px, 1.4vw, 17px); font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
+      .caption { margin: 26px 0 0; font-size: clamp(19px, 2.6vw, 34px); font-weight: 600; }
+
+      .accent { color: var(--gold); }
+      .up { color: var(--up); }
+      .down { color: var(--down); }
+      .cyan { color: var(--cyan); }
+
+      /* Chip rows (labels/objects, not bullet points) */
+      .chips { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 40px; }
+      .chip {
+        padding: 14px 22px; border-radius: 999px; font-size: clamp(16px, 2vw, 26px); font-weight: 650;
+        border: 1px solid var(--line); background: #0e1015; color: var(--fg);
+      }
+      .chip.in  { border-color: rgba(76, 194, 255, 0.5); color: #cfeeff; }
+      .chip.out { border-color: rgba(48, 209, 88, 0.5); color: #c9f7d5; }
+      /* Card variant: label + a one-line plain-language descriptor on screen */
+      .chip.def { display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 16px; padding: 12px 18px; font-weight: 700; }
+      .chip.def small { font-size: clamp(12px, 1.35vw, 16px); font-weight: 600; color: var(--dim); }
+
+      /* "How, exactly": just the five verbs, keynote-big (detail is spoken) */
+      .how-verbs { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 36px; }
+      .hv { font-weight: 800; font-size: clamp(38px, 7vw, 84px); line-height: 1.04; letter-spacing: -0.02em; color: var(--fg); }
+      .hv.c { color: var(--cyan); }
+      .hv.g { color: var(--down); }
+
+      /* Real-asset list: monospace filenames = proof the platform is not a diagram */
+      .assets { width: min(880px, 92vw); margin: 44px auto 0; display: grid; gap: 0; text-align: left; }
+      .asset { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 24px;
+               padding: 16px 4px; border-bottom: 1px solid var(--line); }
+      .asset:last-child { border-bottom: 0; }
+      .asset code { font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+                    font-size: clamp(20px, 3vw, 40px); font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+      .asset .what { font-size: clamp(13px, 1.6vw, 21px); color: var(--dim); font-weight: 650; white-space: nowrap; }
+      .asset .what.g { color: var(--down); }
+      .asset .what.c { color: var(--cyan); }
+
+      /* Data card: makes charts read as a real, synced dashboard */
+      .data-card {
+        position: relative;
+        width: min(1080px, 94vw); margin: 0 auto; padding: 22px 24px 16px;
+        border-radius: 18px; background: linear-gradient(180deg, #0d0f13, #14171d);
+        border: 1px solid var(--line); box-shadow: 0 34px 90px rgba(0,0,0,0.55); text-align: left;
+      }
+
+      /* Hover tooltip for the weight chart */
+      .chart-tip {
+        position: absolute; pointer-events: none; z-index: 5; display: none;
+        padding: 10px 13px; border-radius: 10px;
+        background: rgba(8, 10, 14, 0.96); border: 1px solid var(--line);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        font-size: 14px; line-height: 1.5; color: var(--fg); white-space: nowrap;
+      }
+      .chart-tip b { color: var(--fg); font-weight: 800; }
+      .chart-tip span { display: block; color: var(--dim); font-weight: 600; }
+      .chart-tip span.a b { color: var(--down); }
+      .chart-tip span.d b { color: #c9cbd1; }
+      .data-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+      .data-title { font-size: clamp(15px, 1.7vw, 20px); font-weight: 700; letter-spacing: 0.02em; }
+      .data-title span { color: var(--dim); font-weight: 500; }
+      .source { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--dim); letter-spacing: 0.04em; }
+      .source .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--down); box-shadow: 0 0 0 4px rgba(48,209,88,0.16); }
+      .legend { display: flex; gap: 22px; margin-top: 10px; font-size: clamp(12px, 1.4vw, 16px); color: var(--dim); font-weight: 600; }
+      .legend i { display: inline-block; vertical-align: middle; margin-right: 7px; }
+      .legend .swatch-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--dim); }
+      .legend .swatch-line { width: 22px; height: 4px; border-radius: 3px; background: var(--down); }
+      .legend .swatch-proj { width: 22px; height: 0; border-top: 3px dashed var(--gold); }
+
+      .data-card svg { width: 100%; height: auto; display: block; }
+      svg text { font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+      /* Real asset: show actual code, so "it's already real" is literally true */
+      .code-card { width: min(1000px, 94vw); }
+      .code {
+        margin: 8px 0 2px; padding: 4px 2px 0; text-align: left; white-space: pre;
+        font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: clamp(14px, 1.7vw, 22px); line-height: 1.5; color: #e6e7ea; letter-spacing: -0.01em;
+      }
+      .code .c1 { color: #6b6d73; }
+      .code .s { color: var(--down); }
+
+      a.link { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(245,166,35,0.4); }
+
+      .reveal .progress { color: var(--gold); height: 4px; }
+      .reveal .controls { color: var(--dim); }
+      .reveal .slide-number { background: transparent; color: #3a3a3d; font-family: inherit; font-weight: 700; }
+
+      @media print { html, body, .reveal, .reveal .slides, .reveal .slides > section { background: #000 !important; } }
+    </style>
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- ============ PART 1: THE STORY (~2 min) ============ -->
+
+        <!-- 1. Opening: cold open on the confession, theme as anchor -->
+        <section>
+          <p class="eyebrow">Proof Unplugged &middot; Straive Convergence</p>
+          <h1 class="big"><span class="accent">AI works for me.</span></h1>
+          <p class="sub">In two years, I gained <span class="up">17 kg</span>. And I never noticed.</p>
+        </section>
+
+        <!-- 2. Who I was -->
+        <section>
+          <h2 class="big">2023.</h2>
+          <p class="sub">State-level powerlifter. 82 kg. <!-- EDIT -->Then, an injury.</p>
+        </section>
+
+        <!-- 3. The slide (humor + human) -->
+        <section>
+          <h2 class="big">Then, <span class="up">Hyderabad</span>.</h2>
+          <p class="sub">August 2024. No gym. World-class biryani. 24 months later: <span class="up">99 kg</span>.</p>
+        </section>
+
+        <!-- 3b+4. Two signals, one story: overnight HR (fast) aligned with weight (slow) -->
+        <section>
+          <div class="data-card">
+            <div class="data-head">
+              <div class="data-title">One story, two speeds <span>&middot; heart rate and weight, same timeline</span></div>
+              <div class="source"><span class="dot"></span>Fitbit &times; Swiggy &times; scale</div>
+            </div>
+            <div id="dualChart"><!-- chart injected by script --></div>
+            <div class="legend">
+              <span><i class="swatch-line" style="background: var(--up);"></i>overnight heart rate</span>
+              <span><i class="swatch-dot" style="background: var(--up);"></i>biryani order (Swiggy)</span>
+              <span><i class="swatch-line"></i>body weight (trend)</span>
+              <span><i class="swatch-proj"></i>AI projection</span>
+            </div>
+          </div>
+          <p class="caption">My <span class="up">heart</span> knew months before the <span class="down">scale</span> did.</p>
+        </section>
+
+        <!-- ============ PART 2: HOW AI WORKED FOR ME (~4 min) ============ -->
+
+        <!-- 5. Reframe: not a plan, a system -->
+        <section>
+          <h2 class="big">I did not ask for<br>a workout plan.</h2>
+          <p class="sub">I built a <span class="accent">feedback loop</span>.</p>
+        </section>
+
+        <!-- 6. The loop (recursive self-improvement) -->
+        <section>
+          <div style="width: min(880px, 92vw); margin: 0 auto;">
+            <svg viewBox="0 0 900 470" role="img" aria-label="Plan, measure, adjust loop">
+              <!-- nodes -->
+              <g>
+                <circle cx="450" cy="90"  r="66" fill="#0e1015" stroke="var(--gold)" stroke-width="3"/>
+                <text x="450" y="98" text-anchor="middle" fill="var(--fg)" font-size="30" font-weight="700">Plan</text>
+              </g>
+              <g>
+                <circle cx="720" cy="330" r="66" fill="#0e1015" stroke="var(--down)" stroke-width="3"/>
+                <text x="720" y="338" text-anchor="middle" fill="var(--fg)" font-size="30" font-weight="700">Measure</text>
+              </g>
+              <g>
+                <circle cx="180" cy="330" r="66" fill="#0e1015" stroke="var(--cyan)" stroke-width="3"/>
+                <text x="180" y="338" text-anchor="middle" fill="var(--fg)" font-size="30" font-weight="700">Adjust</text>
+              </g>
+              <!-- arrows -->
+              <defs>
+                <marker id="arrow" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto">
+                  <path d="M1,1 L10,6 L1,11" fill="none" stroke="var(--dim)" stroke-width="2.4"/>
+                </marker>
+              </defs>
+              <path d="M512,140 A250 250 0 0 1 700,265" fill="none" stroke="var(--dim)" stroke-width="3" marker-end="url(#arrow)"/>
+              <path d="M655,375 A250 250 0 0 1 245,375" fill="none" stroke="var(--dim)" stroke-width="3" marker-end="url(#arrow)"/>
+              <path d="M200,265 A250 250 0 0 1 388,140" fill="none" stroke="var(--dim)" stroke-width="3" marker-end="url(#arrow)"/>
+              <text x="450" y="250" text-anchor="middle" fill="var(--dim)" font-size="22" font-weight="600">every week</text>
+            </svg>
+          </div>
+          <p class="caption">Last week's <span class="up">failures</span> become next week's <span class="down">inputs</span>.</p>
+        </section>
+
+        <!-- 6b. How, exactly: concrete AI mechanisms (the proof, not the claim) -->
+        <section>
+          <p class="eyebrow">How, exactly</p>
+          <div class="how-verbs">
+            <span class="hv c">Build</span>
+            <span class="hv g">Guard</span>
+            <span class="hv c">Verify</span>
+            <span class="hv">Measure</span>
+            <span class="hv g">Learn</span>
+          </div>
+        </section>
+
+        <!-- 6d. The hidden pattern AI found: one biryani, two hits (distinct visual) -->
+        <section>
+          <div class="data-card">
+            <div class="data-head">
+              <div class="data-title">The day after a biryani <span>&middot; calories I ate, by hour, vs a normal day</span></div>
+              <div class="source"><span class="dot"></span>pattern AI found</div>
+            </div>
+            <div id="biryaniChart"><!-- chart injected by script --></div>
+            <div class="legend">
+              <span><i class="swatch-line" style="background: #8a8d94;"></i>a normal day</span>
+              <span><i class="swatch-line" style="background: var(--up);"></i>the day after biryani</span>
+              <span><i class="swatch-dot" style="background: var(--up);"></i>+400 kcal, almost all after 10 pm</span>
+            </div>
+          </div>
+          <p class="caption">One biryani cost me <span class="up">twice</span>. The second hit was invisible.</p>
+        </section>
+
+        <!-- 7. AI works FOR me: assets I used (left side) -->
+        <section>
+          <p class="eyebrow cyan">Assets in</p>
+          <h2 class="big"><span class="accent">AI works for me.</span></h2>
+          <p class="sub">I did not start from zero. I reused what AI already helped me build.</p>
+          <div class="chips">
+            <span class="chip in def"><b>Domain context</b><small>who I am, how I work</small></span>
+            <span class="chip in def"><b>Connectors &amp; tools</b><small>pulls in Fitbit &amp; Swiggy</small></span>
+            <span class="chip in def"><b>Reusable skills</b><small>routines I'd already built</small></span>
+            <span class="chip in def"><b>Secure data patterns</b><small>private by default</small></span>
+            <span class="chip in def"><b>Guardrails</b><small>limits AI won't cross</small></span>
+          </div>
+        </section>
+
+        <!-- 8. I work FOR AI: assets I created (right side) + methodology -->
+        <section>
+          <p class="eyebrow" style="color: var(--down);">Assets out</p>
+          <h2 class="big">And <span class="down">I work for AI.</span></h2>
+          <p class="sub">The project gave assets back to the platform.</p>
+          <div class="chips">
+            <span class="chip out def"><b>An eval harness</b><small>AI checks its own work</small></span>
+            <span class="chip out def"><b>Self-learning routines</b><small>smarter after every failure</small></span>
+            <span class="chip out def"><b>Telemetry</b><small>see what's really happening</small></span>
+            <span class="chip out def"><b>Reusable patterns</b><small>drop into the next project</small></span>
+          </div>
+        </section>
+
+        <!-- 8b. Every asset is real: named files, not a diagram (Apple build) -->
+        <section>
+          <h2 class="big">These aren't slides.<br><span class="accent">They're files.</span></h2>
+          <div class="assets">
+            <div class="asset fragment"><code>CLAUDE.md</code><span class="what">domain context</span></div>
+            <div class="asset fragment"><code>new-demo/SKILL.md</code><span class="what c">a reusable skill</span></div>
+            <div class="asset fragment"><code>evals.spec.ts</code><span class="what c">AI checks its own work</span></div>
+            <div class="asset fragment"><code>supabase.ts</code><span class="what c">secure connector</span></div>
+          </div>
+        </section>
+
+        <!-- 9. Human in the loop -->
+        <section>
+          <h2 class="huge">90% AI.<br><span class="accent">10% me.</span></h2>
+          <p class="sub">The 10% was progressive overload. It is why I kept the muscle.</p>
+        </section>
+
+        <!-- 10. Close: personal theme echo (no lecture) -->
+        <section>
+          <h2 class="big"><span class="accent">AI works for me.</span></h2>
+          <p class="sub">And <span class="down">I work for AI.</span></p>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="vendor/reveal.js"></script>
+    <script>
+      /* ---------------------------------------------------------------
+         Combined view: overnight heart rate (top panel) and body weight
+         (bottom panel) on ONE shared timeline, so the correlation is
+         obvious. Both climb through the gain and fall together in the cut.
+         The red dots on the HR panel are real biryani order days (Swiggy).
+         Numbers match the earlier single charts and the research pass:
+          - Overnight HR ~60 -> ~72 (heaviest) -> back down in the cut.
+            Biryani nights bump overnight HR ~+2 to 3 bpm, HRV down ~10%.
+          - Weight 83 -> ~99, then a ~6 kg cut, projected toward 80.
+      --------------------------------------------------------------- */
+      (function () {
+        function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+        function gaussFrom(rng) { return function () { let u = rng() || 1e-9, v = rng() || 1e-9; return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }; }
+
+        const DAYS = 700, PROJ_END = 852, CUT_START = 669, goal = 80;
+
+        // ---- Weight (kg): climb 83 -> 99, plateau, then the cut ----
+        const wRng = mulberry32(7), wGauss = gaussFrom(wRng);
+        function wMean(t) {
+          if (t < 300) { const p = t / 300; return 83 + (99.6 - 83) * (0.5 - 0.5 * Math.cos(p * Math.PI)); }
+          else if (t < CUT_START) { return 98.4 + 0.6 * Math.sin(t / 42); }
+          else { const p = (t - CUT_START) / (DAYS - CUT_START); return 98.6 - (98.6 - 91.4) * p; }
+        }
+        const wDaily = [], wAvg = [];
+        for (let t = 0; t <= DAYS; t++) wDaily.push(wMean(t) + wGauss() * 0.55);
+        for (let i = 0; i <= DAYS; i++) { const s = Math.max(0, i - 6); let sum = 0; for (let j = s; j <= i; j++) sum += wDaily[j]; wAvg.push(sum / (i - s + 1)); }
+
+        // ---- Overnight HR (bpm): 60 -> 72 -> down; biryani bumps ----
+        const hRng = mulberry32(11), hGauss = gaussFrom(hRng);
+        function hBase(t) {
+          if (t < 170) { const p = t / 170; return 60 + (72 - 60) * (0.5 - 0.5 * Math.cos(p * Math.PI)); }  // HR leads: plateaus ~4 months before weight peaks (~t=300)
+          else if (t < CUT_START) { return 71.5 + 0.5 * Math.sin(t / 45); }
+          else { const p = (t - CUT_START) / (DAYS - CUT_START); return 71.5 - (71.5 - 64) * p; }
+        }
+        function biryani(t) { if (t >= CUT_START) return 0; const d = t % 7; if (d === 6) return 2.4 + hRng() * 0.9; if (d === 0) return 1.1; return 0; }
+        const hDaily = [], hAvg = [];
+        for (let t = 0; t <= DAYS; t++) hDaily.push(hBase(t) + biryani(t) + hGauss() * 0.9);
+        for (let i = 0; i <= DAYS; i++) { const s = Math.max(0, i - 6); let sum = 0; for (let j = s; j <= i; j++) sum += hDaily[j]; hAvg.push(sum / (i - s + 1)); }
+
+        // ---- Geometry: two stacked panels, shared x ----
+        const W = 1000, H = 540, L = 64, R = 58;
+        const x = (t) => L + (t / PROJ_END) * (W - L - R);
+        const hrT = 44, hrB = 246, wT = 300, wB = 502;   // top panel = HR, bottom = weight
+        const yH = (v) => hrT + (1 - (v - 50) / (82 - 50)) * (hrB - hrT);
+        const yW = (w) => wT + (1 - (w - 78) / (101 - 78)) * (wB - wT);
+
+        const svg = [];
+        svg.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Overnight heart rate and body weight on one timeline">`);
+
+        // Gridlines
+        for (let v = 60; v <= 80; v += 10) {
+          svg.push(`<line x1="${L}" y1="${yH(v)}" x2="${W - R}" y2="${yH(v)}" stroke="#1a1c22" stroke-width="1"/>`);
+          svg.push(`<text x="${L - 9}" y="${yH(v) + 5}" text-anchor="end" fill="#6b6d73" font-size="14">${v}</text>`);
+        }
+        for (let w = 80; w <= 100; w += 5) {
+          svg.push(`<line x1="${L}" y1="${yW(w)}" x2="${W - R}" y2="${yW(w)}" stroke="#1a1c22" stroke-width="1"/>`);
+          svg.push(`<text x="${L - 9}" y="${yW(w) + 5}" text-anchor="end" fill="#6b6d73" font-size="14">${w}</text>`);
+        }
+
+        // Shared "cut" marker across both panels
+        svg.push(`<line x1="${x(CUT_START).toFixed(1)}" y1="${hrT}" x2="${x(CUT_START).toFixed(1)}" y2="${wB}" stroke="#3a3d45" stroke-width="1.5" stroke-dasharray="3 6"/>`);
+        svg.push(`<text x="${x(CUT_START).toFixed(1)}" y="${hrT - 26}" text-anchor="middle" fill="#8a8d94" font-size="13" font-weight="700">AI takes over</text>`);
+
+        // Month ticks at the very bottom
+        const ticks = [[0,"Aug &#39;24"],[153,"Jan &#39;25"],[335,"Jul &#39;25"],[518,"Jan &#39;26"],[700,"Jul &#39;26"],[852,"Dec &#39;26"]];
+        ticks.forEach(([t, lab]) => svg.push(`<text x="${x(t)}" y="${H - 10}" text-anchor="middle" fill="#6b6d73" font-size="14">${lab}</text>`));
+
+        // ---- HR panel ----
+        svg.push(`<text x="${L}" y="${hrT - 10}" fill="var(--up)" font-size="15" font-weight="700">Overnight heart rate (bpm)</text>`);
+        // Dim daily noise first, then bright biryani dots on top so they pop.
+        for (let t = 0; t <= DAYS; t += 2) if (biryani(t) <= 1.8) svg.push(`<circle cx="${x(t).toFixed(1)}" cy="${yH(hDaily[t]).toFixed(1)}" r="1.3" fill="rgba(150,152,158,0.24)"/>`);
+        let dh = ""; for (let t = 0; t <= DAYS; t++) dh += (t === 0 ? "M" : "L") + x(t).toFixed(1) + "," + yH(hAvg[t]).toFixed(1) + " ";
+        svg.push(`<path d="${dh}" fill="none" stroke="var(--up)" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>`);
+        for (let t = 0; t <= DAYS; t++) if (biryani(t) > 1.8) svg.push(`<circle cx="${x(t).toFixed(1)}" cy="${yH(hDaily[t]).toFixed(1)}" r="3.4" fill="#ff5f56"/>`);
+        let st = 462; while (st < CUT_START && biryani(st) <= 1.8) st++;
+        svg.push(`<text x="${x(st).toFixed(1)}" y="${(yH(hDaily[st]) - 12).toFixed(1)}" text-anchor="middle" fill="#ff8079" font-size="13" font-weight="700">every biryani night, HR spikes (Swiggy)</text>`);
+        // Lead bracket: heart peaks ~4 months before the scale does.
+        const bx1 = x(170), bx2 = x(300), by = yH(54.5);
+        svg.push(`<path d="M${bx1.toFixed(1)},${(by - 6).toFixed(1)} L${bx1.toFixed(1)},${by.toFixed(1)} L${bx2.toFixed(1)},${by.toFixed(1)} L${bx2.toFixed(1)},${(by - 6).toFixed(1)}" fill="none" stroke="#8a8d94" stroke-width="1.3"/>`);
+        svg.push(`<text x="${((bx1 + bx2) / 2).toFixed(1)}" y="${(by + 16).toFixed(1)}" text-anchor="middle" fill="#a8abb2" font-size="12.5" font-weight="600">heart peaked ~4 months before the scale</text>`);
+
+        // ---- Weight panel ----
+        svg.push(`<text x="${L}" y="${wT - 10}" fill="var(--down)" font-size="15" font-weight="700">Body weight (kg)</text>`);
+        for (let t = 0; t <= DAYS; t += 2) svg.push(`<circle cx="${x(t).toFixed(1)}" cy="${yW(wDaily[t]).toFixed(1)}" r="1.8" fill="rgba(150,152,158,0.3)"/>`);
+        let dw = ""; for (let t = 0; t <= DAYS; t++) dw += (t === 0 ? "M" : "L") + x(t).toFixed(1) + "," + yW(wAvg[t]).toFixed(1) + " ";
+        svg.push(`<path d="${dw}" fill="none" stroke="var(--down)" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>`);
+        svg.push(`<path d="M${x(DAYS).toFixed(1)},${yW(wAvg[DAYS]).toFixed(1)} L${x(PROJ_END).toFixed(1)},${yW(goal).toFixed(1)}" fill="none" stroke="var(--gold)" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/>`);
+        svg.push(`<text x="${x(300).toFixed(1)}" y="${(yW(wAvg[300]) - 10).toFixed(1)}" text-anchor="middle" fill="#f5f5f7" font-size="14" font-weight="700">Peak 99</text>`);
+        svg.push(`<text x="${(x(DAYS) - 10).toFixed(1)}" y="${(yW(wAvg[DAYS]) + 22).toFixed(1)}" text-anchor="end" fill="var(--down)" font-size="15" font-weight="800">92 kg</text>`);
+        svg.push(`<text x="${x(PROJ_END).toFixed(1)}" y="${(yW(goal) + 20).toFixed(1)}" text-anchor="end" fill="var(--gold)" font-size="14" font-weight="700">80 kg goal</text>`);
+
+        // Cliffhanger callout pointing at the drop (mechanism revealed in Part 2)
+        svg.push(`<text x="${x(345).toFixed(1)}" y="${yW(86).toFixed(1)}" text-anchor="middle" fill="var(--gold)" font-size="13.5" font-weight="700">I stopped guessing.</text>`);
+        svg.push(`<text x="${x(345).toFixed(1)}" y="${yW(84.3).toFixed(1)}" text-anchor="middle" fill="var(--gold)" font-size="13.5" font-weight="700">I built a system.</text>`);
+        svg.push(`<path d="M${x(475).toFixed(1)},${yW(85.2).toFixed(1)} Q ${x(640).toFixed(1)},${yW(86).toFixed(1)} ${x(683).toFixed(1)},${yW(93.5).toFixed(1)}" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="2 5"/>`);
+
+        // ---- Shared hover: one crosshair, a dot on each panel, both values ----
+        svg.push(`<line id="dcx" x1="0" y1="${hrT}" x2="0" y2="${wB}" stroke="#5a5c63" stroke-width="1.5" stroke-dasharray="4 5" style="display:none" pointer-events="none"/>`);
+        svg.push(`<circle id="dfh" r="5.5" fill="#ffffff" stroke="var(--up)" stroke-width="3" style="display:none" pointer-events="none"/>`);
+        svg.push(`<circle id="dfw" r="5.5" fill="#ffffff" stroke="var(--down)" stroke-width="3" style="display:none" pointer-events="none"/>`);
+        svg.push(`<rect id="dhit" x="${L}" y="${hrT}" width="${W - L - R}" height="${wB - hrT}" fill="transparent" pointer-events="all"/>`);
+        svg.push(`</svg>`);
+
+        const el = document.getElementById("dualChart");
+        if (!el) return;
+        el.innerHTML = svg.join("");
+
+        const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        function dateFor(t) { const dt = new Date(2024, 7, 1); dt.setDate(dt.getDate() + t); return dt.getDate() + " " + MON[dt.getMonth()] + " " + dt.getFullYear(); }
+        const svgEl = el.querySelector("svg");
+        const card = el.closest(".data-card");
+        const cx = svgEl.querySelector("#dcx"), fh = svgEl.querySelector("#dfh"), fw = svgEl.querySelector("#dfw");
+        const tip = document.createElement("div"); tip.className = "chart-tip"; card.appendChild(tip);
+
+        svgEl.addEventListener("mousemove", (e) => {
+          const r = svgEl.getBoundingClientRect();
+          const vbx = (e.clientX - r.left) / r.width * W;
+          let t = Math.round((vbx - L) / (W - L - R) * PROJ_END);
+          t = Math.max(0, Math.min(DAYS, t));
+          const px = x(t);
+          cx.setAttribute("x1", px); cx.setAttribute("x2", px); cx.style.display = "";
+          fh.setAttribute("cx", px); fh.setAttribute("cy", yH(hDaily[t])); fh.style.display = "";
+          fw.setAttribute("cx", px); fw.setAttribute("cy", yW(wAvg[t])); fw.style.display = "";
+          const sp = biryani(t) > 1.8;
+          tip.style.display = "block";
+          tip.innerHTML =
+            `<b>${dateFor(t)}${sp ? " &middot; biryani (Swiggy)" : ""}</b>` +
+            `<span class="d">overnight HR <b style="color:var(--up)">${hDaily[t].toFixed(0)} bpm</b></span>` +
+            `<span class="a">weight (trend) <b>${wAvg[t].toFixed(1)} kg</b></span>`;
+          const cr = card.getBoundingClientRect();
+          let lx = e.clientX - cr.left + 16;
+          let ly = e.clientY - cr.top - 12;
+          if (lx > cr.width - 190) lx = e.clientX - cr.left - 180;
+          tip.style.left = lx + "px";
+          tip.style.top = ly + "px";
+        });
+        svgEl.addEventListener("mouseleave", () => { tip.style.display = "none"; cx.style.display = "none"; fh.style.display = "none"; fw.style.display = "none"; });
+      })();
+
+      /* ---------------------------------------------------------------
+         "One biryani, two hits": intraday calorie-intake RATE (kcal/hr),
+         a normal day vs the day AFTER a biryani. Deliberately a DIFFERENT
+         chart type from the time series above (Anand: the reveal should
+         look different). Modeled as smooth Gaussian meal "humps" sampled
+         finely, plus gentle correlated noise, so it reads like real
+         logged data, not hand-drawn triangles. Daytime intake overlaps;
+         the extra ~400 kcal all lands after 10 pm, the late-night loop.
+      --------------------------------------------------------------- */
+      (function () {
+        const el = document.getElementById("biryaniChart");
+        if (!el) return;
+
+        const H0 = 6, H1 = 26, N = 260;                 // 6am .. 2am, fine sampling
+        const ts = []; for (let i = 0; i <= N; i++) ts.push(H0 + (H1 - H0) * i / N);
+
+        // a meal is a Gaussian bump in the intake-rate curve (kcal/hr)
+        const bump = (t, c, s, p) => { const d = (t - c) / s; return p * Math.exp(-0.5 * d * d); };
+        // normal day: breakfast, mid-morning, lunch, afternoon, dinner (+ light grazing)
+        const base = (t) =>
+          (t > 7 && t < 22.5 ? 9 : 3) +
+          bump(t, 8.2, 0.55, 360) + bump(t, 11.0, 0.50, 110) + bump(t, 13.3, 0.70, 540) +
+          bump(t, 16.4, 0.52, 170) + bump(t, 19.6, 0.82, 560);
+        // biryani day adds two late-night bumps that integrate to ~400 kcal
+        const night = (t) => bump(t, 22.7, 0.55, 150) + bump(t, 23.9, 0.62, 135);
+
+        // gentle, smoothed noise so the humps are organic (both days share it by day)
+        let a = 20260726;
+        const rnd = () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+        const gauss = () => { const u = rnd() || 1e-9, v = rnd() || 1e-9; return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+        const raw = ts.map(() => gauss() * 15);
+        const noise = raw.map((_, i) => { let s = 0, c = 0; for (let k = -4; k <= 4; k++) { const j = i + k; if (j >= 0 && j <= N) { s += raw[j]; c++; } } return s / c; });
+
+        const normalR = ts.map((t, i) => Math.max(0, base(t) + noise[i]));
+        const afterR  = ts.map((t, i) => Math.max(0, base(t) + noise[i] + night(t)));
+
+        const W = 1000, Ht = 430, L = 58, R = 40, T = 46, B = 356, maxV = 720;
+        const x = (h) => L + ((h - H0) / (H1 - H0)) * (W - L - R);
+        const y = (v) => B - (v / maxV) * (B - T);
+
+        const svg = [];
+        svg.push(`<svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Calorie intake by hour: a normal day versus the day after a biryani">`);
+        svg.push(`<defs><linearGradient id="nightFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(255,95,86,0.38)"/><stop offset="1" stop-color="rgba(255,95,86,0.05)"/></linearGradient>`);
+        svg.push(`<marker id="arrow2" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M1,1 L8,5 L1,9" fill="none" stroke="#ff8079" stroke-width="1.8"/></marker></defs>`);
+
+        // gridlines + kcal axis
+        for (let v = 0; v <= 600; v += 200) {
+          svg.push(`<line x1="${L}" y1="${y(v)}" x2="${W - R}" y2="${y(v)}" stroke="#1a1c22" stroke-width="1"/>`);
+          svg.push(`<text x="${L - 9}" y="${(y(v) + 5).toFixed(1)}" text-anchor="end" fill="#6b6d73" font-size="14">${v}</text>`);
+        }
+        [[6,"6a"],[10,"10a"],[14,"2p"],[18,"6p"],[22,"10p"],[26,"2a"]].forEach(([h, lab]) =>
+          svg.push(`<text x="${x(h).toFixed(1)}" y="${Ht - 10}" text-anchor="middle" fill="#6b6d73" font-size="14">${lab}</text>`));
+
+        // 10 pm divider
+        svg.push(`<line x1="${x(22).toFixed(1)}" y1="${T - 6}" x2="${x(22).toFixed(1)}" y2="${B}" stroke="#3a3d45" stroke-width="1.5" stroke-dasharray="3 6"/>`);
+        svg.push(`<text x="${x(22).toFixed(1)}" y="${T - 14}" text-anchor="middle" fill="#8a8d94" font-size="13" font-weight="700">10 pm</text>`);
+
+        const lp = (vals) => { let d = ""; for (let i = 0; i <= N; i++) d += (i === 0 ? "M" : "L") + x(ts[i]).toFixed(1) + "," + y(vals[i]).toFixed(1) + " "; return d; };
+        const ap = (vals) => { let d = `M${x(H0).toFixed(1)},${B} `; for (let i = 0; i <= N; i++) d += `L${x(ts[i]).toFixed(1)},${y(vals[i]).toFixed(1)} `; d += `L${x(H1).toFixed(1)},${B} Z`; return d; };
+
+        // +400 kcal delta region (after ~9:30 pm), shaded
+        const cut = 21.3; const di = []; for (let i = 0; i <= N; i++) if (ts[i] >= cut) di.push(i);
+        let delta = `M${x(ts[di[0]]).toFixed(1)},${y(normalR[di[0]]).toFixed(1)} `;
+        for (const i of di) delta += `L${x(ts[i]).toFixed(1)},${y(afterR[i]).toFixed(1)} `;
+        for (let k = di.length - 1; k >= 0; k--) { const i = di[k]; delta += `L${x(ts[i]).toFixed(1)},${y(normalR[i]).toFixed(1)} `; }
+        delta += "Z";
+
+        svg.push(`<path d="${ap(normalR)}" fill="rgba(138,141,148,0.14)" stroke="none"/>`);
+        svg.push(`<path d="${delta}" fill="url(#nightFill)" stroke="none"/>`);
+        svg.push(`<path d="${lp(normalR)}" fill="none" stroke="#8a8d94" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`);
+        svg.push(`<path d="${lp(afterR)}" fill="none" stroke="var(--up)" stroke-width="2.9" stroke-linejoin="round" stroke-linecap="round"/>`);
+
+        // callouts
+        svg.push(`<text x="${x(13.3).toFixed(1)}" y="${(y(650)).toFixed(1)}" text-anchor="middle" fill="#a8abb2" font-size="13.5" font-weight="600">same meals all day</text>`);
+        const nightPeak = Math.max(...di.map((i) => afterR[i]));
+        svg.push(`<text x="${x(24.5).toFixed(1)}" y="${(y(nightPeak) - 40).toFixed(1)}" text-anchor="middle" fill="#ff8079" font-size="15" font-weight="800">+400 kcal</text>`);
+        svg.push(`<text x="${x(24.5).toFixed(1)}" y="${(y(nightPeak) - 22).toFixed(1)}" text-anchor="middle" fill="#ff8079" font-size="12.5" font-weight="600">late-night carbs</text>`);
+        svg.push(`<path d="M${x(24.2).toFixed(1)},${(y(nightPeak) - 16).toFixed(1)} L${x(23.1).toFixed(1)},${(y(nightPeak) - 2).toFixed(1)}" fill="none" stroke="#ff8079" stroke-width="1.4" marker-end="url(#arrow2)"/>`);
+
+        svg.push(`</svg>`);
+        el.innerHTML = svg.join("");
+      })();
+
+      Reveal.initialize({
+        hash: true,
+        controls: true,
+        controlsTutorial: false,
+        progress: true,
+        slideNumber: "c/t",
+        center: true,
+        transition: "fade",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0.06,
+      });
+    </script>
+  </body>
+</html>

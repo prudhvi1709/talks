@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+# local screenshot / automation scratch files
+.*.mjs
+.*.png
