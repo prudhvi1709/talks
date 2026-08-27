@@ -1,0 +1,48 @@
+# Claude Code local config/instructions - not meant to be shared
+CLAUDE.md
+.claude/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+uv.lock.bak
+
+# Node (per-project node_modules, in case any talk subproject adds one)
+node_modules/
+
+# Secrets / environment
+.env
+.env.*
+credentials.json
+
+# Scratch / temp files
+*.tmp
+*.temp
+*.log
+_*.html
+_*.mjs

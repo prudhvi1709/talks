@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Good Enough for What?</title>
+
+    <!-- Reveal.js core (vendored, offline-safe) -->
+    <link rel="stylesheet" href="vendor/reveal.css">
+
+    <style>
+      /* -------------------------------------------------------------------
+         Same flavor as ai-works-for-me: Apple/keynote style, one idea per
+         screen, no bullets except the takeaways slide. Charts are real SVG
+         built from figures.md numbers, not screenshots.
+
+         Full build, all 22 plan slides, nothing cut: all three cases and
+         verdicts, the pre-registered-bar mechanism (#9), the third-layer
+         adjudicator sub-story (#15-17), the pattern slide, the honest
+         complication (#19: the model was rarely the lever), takeaways, close.
+         No live demo (plan #20 is now a static slide, "The bound, on one
+         page") - the room isn't getting a live terminal run, so the artifact
+         is presented as captured output instead. Every metric-bearing slide
+         carries a real chart (bar, band, dot-plot, or timeline), built from
+         the numbers in figures.md - never a bare number on its own line.
+
+         Every <section> carries an <aside class="notes"> with the exact
+         spoken line for that slide - this is the single source of truth for
+         what gets said on stage. Press 's' during the deck to open the
+         reveal.js speaker-view popup (vendor/plugin/notes/notes.js) showing
+         the current slide, the next slide, a timer, and this note, live -
+         read straight from it on stage.
+      ------------------------------------------------------------------- */
+      :root {
+        --bg: #050608;
+        --fg: #f5f5f7;
+        --dim: #86868b;
+        --line: #23252b;
+        --up: #ff5f56;
+        --down: #30d158;
+        --gold: #f5a623;
+        --cyan: #4cc2ff;
+
+        --r-background-color: #050608;
+        --r-main-color: #f5f5f7;
+        --r-heading-color: #f5f5f7;
+        --r-link-color: #f5a623;
+        --r-link-color-hover: #ffbf4d;
+        --r-selection-background-color: #f5a623;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { background: var(--bg); color: var(--fg); }
+      .reveal-viewport, .reveal .backgrounds { background-color: var(--bg) !important; }
+
+      .reveal {
+        font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--fg);
+        letter-spacing: -0.01em;
+      }
+      .reveal .slides { text-align: center; }
+      .reveal h1, .reveal h2, .reveal p { color: var(--fg); text-transform: none; }
+
+      .big  { margin: 0; font-weight: 700; font-size: clamp(42px, 8vw, 118px); line-height: 0.98; }
+      .huge { margin: 0; font-weight: 800; font-size: clamp(60px, 10vw, 160px); line-height: 0.9; letter-spacing: -0.03em; }
+      .sub  { margin: 26px 0 0; font-weight: 500; font-size: clamp(20px, 3.2vw, 40px); color: var(--dim); line-height: 1.18; }
+      .eyebrow { margin: 0 0 34px; font-size: clamp(12px, 1.4vw, 17px); font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
+      .caption { margin: 26px 0 0; font-size: clamp(19px, 2.6vw, 34px); font-weight: 600; }
+
+      .accent { color: var(--gold); }
+      .up { color: var(--up); }
+      .down { color: var(--down); }
+      .cyan { color: var(--cyan); }
+      .dim { color: var(--dim); }
+
+      /* Data card: the same "real dashboard" treatment for the bar chart */
+      .data-card {
+        position: relative;
+        width: min(1080px, 94vw); margin: 0 auto; padding: 22px 24px 16px;
+        border-radius: 18px; background: linear-gradient(180deg, #0d0f13, #14171d);
+        border: 1px solid var(--line); box-shadow: 0 34px 90px rgba(0,0,0,0.55); text-align: left;
+      }
+      .data-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
+      .data-title { font-size: clamp(15px, 1.7vw, 20px); font-weight: 700; letter-spacing: 0.02em; }
+      .data-title span { color: var(--dim); font-weight: 500; }
+      .source { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--dim); letter-spacing: 0.04em; }
+      .source .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--down); box-shadow: 0 0 0 4px rgba(48,209,88,0.16); }
+      .data-card svg { width: 100%; height: auto; display: block; }
+      svg text { font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+      /* Terminal / code card, for the diff and the live-demo output */
+      .code-card { width: min(1000px, 94vw); }
+      .term-head { display: flex; gap: 8px; margin-bottom: 14px; }
+      .term-dot { width: 12px; height: 12px; border-radius: 999px; }
+      .code {
+        margin: 4px 0 2px; padding: 4px 2px 0; text-align: left; white-space: pre;
+        font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: clamp(12px, 1.25vw, 16px); line-height: 1.42; color: #e6e7ea; letter-spacing: -0.01em;
+        overflow-x: auto;
+      }
+      .code .c1 { color: #6b6d73; }
+      .code .prompt { color: var(--cyan); }
+      .code .bad { color: var(--up); font-weight: 700; }
+      .code .good { color: var(--down); font-weight: 700; }
+      .code .gold { color: var(--gold); font-weight: 700; }
+      .code .circled { border: 1.5px solid var(--up); border-radius: 6px; padding: 0 6px; }
+
+      /* Chip row: the three-case pattern slide (continuity with ai-works-for-me) */
+      .chips { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 40px; }
+      .chip {
+        padding: 14px 22px; border-radius: 999px; font-size: clamp(15px, 1.8vw, 22px); font-weight: 650;
+        border: 1px solid var(--line); background: #0e1015; color: var(--fg);
+      }
+
+      /* Asset rows: monospace stat + plain-language label, same pattern as ai-works-for-me */
+      .assets { width: min(880px, 92vw); margin: 40px auto 0; display: grid; gap: 0; text-align: left; }
+      .asset { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 24px;
+               padding: 16px 4px; border-bottom: 1px solid var(--line); }
+      .asset:last-child { border-bottom: 0; }
+      .asset code { font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+                    font-size: clamp(19px, 2.6vw, 32px); font-weight: 700; color: var(--up); letter-spacing: -0.01em; }
+      .asset .what { font-size: clamp(13px, 1.6vw, 19px); color: var(--dim); font-weight: 650; text-align: right; }
+
+      /* Metric row: a labeled bar, used for every metric comparison in the deck */
+      .metric-panel { width: min(820px, 92vw); margin: 34px auto 0; text-align: left; }
+      .metric-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+      .metric-row:last-child { margin-bottom: 0; }
+      .metric-row.gap { margin-bottom: 34px; }
+      .metric-label { width: 230px; flex-shrink: 0; text-align: left; font-weight: 650; font-size: clamp(14px, 1.6vw, 19px); color: var(--fg); }
+      .metric-track { position: relative; flex: 1; height: 14px; background: #161820; border-radius: 7px; }
+      .metric-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 7px; }
+      .metric-fill.up { background: var(--up); }
+      .metric-fill.down { background: var(--down); }
+      .metric-fill.accent { background: var(--gold); }
+      .metric-fill.cyan { background: var(--cyan); }
+      .metric-band { position: absolute; top: 0; height: 100%; background: rgba(48, 209, 88, 0.22); border-left: 2px solid var(--down); border-right: 2px solid var(--down); }
+      .metric-threshold { position: absolute; top: -8px; bottom: -8px; width: 2px; background: var(--gold); }
+      .metric-tag { position: absolute; top: -24px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+      .metric-value { width: 78px; flex-shrink: 0; text-align: right; font-weight: 800; font-size: clamp(16px, 2vw, 22px); }
+      .dot-marker { position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 999px; transform: translate(-50%, -50%); border: 2px solid var(--bg); }
+
+      /* Proportion bar: one number split into a share, real not decorative */
+      .prop-bar { position: relative; width: min(760px, 90vw); height: 22px; margin: 36px auto 0; background: #161820; border-radius: 11px; overflow: hidden; }
+      .prop-bar .seg { position: absolute; top: 0; height: 100%; }
+      .prop-legend { display: flex; justify-content: center; gap: 26px; margin-top: 14px; font-size: clamp(13px, 1.5vw, 16px); font-weight: 650; color: var(--dim); }
+      .prop-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 999px; margin-right: 7px; vertical-align: middle; }
+
+      /* Correctness grid: colored cells, text label instead of check/cross glyphs */
+      .grid3 { display: grid; grid-template-columns: auto 1fr; gap: 20px 26px; width: min(680px, 90vw); margin: 40px auto 0; align-items: center; }
+      .grid3 .rlabel { text-align: right; font-weight: 700; font-size: clamp(14px, 1.6vw, 19px); color: var(--fg); }
+      .grid3 .cells { display: flex; gap: 14px; }
+      .cell { width: 68px; height: 68px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; letter-spacing: 0.02em; }
+      .cell.ok { background: rgba(48, 209, 88, 0.16); border: 1px solid rgba(48, 209, 88, 0.55); color: var(--down); }
+      .cell.no { background: rgba(255, 95, 86, 0.14); border: 1px solid rgba(255, 95, 86, 0.55); color: var(--up); }
+
+      /* Two-box comparison card */
+      .compare2 { display: flex; gap: 26px; justify-content: center; width: min(880px, 92vw); margin: 36px auto 0; flex-wrap: wrap; }
+      .cbox { flex: 1; min-width: 260px; padding: 26px 24px; border-radius: 16px; background: linear-gradient(180deg, #0d0f13, #14171d); border: 1px solid var(--line); text-align: left; }
+      .cbox .clabel { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
+      .cbox .cvalue { font-size: clamp(24px, 3.4vw, 40px); font-weight: 800; color: var(--fg); line-height: 1.1; }
+      .cbox .cnote { margin-top: 10px; font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-weight: 600; }
+
+      /* Architecture diagram: boxes + arrows, no imagery - pipeline shape only */
+      .arch { width: min(960px, 94vw); margin: 44px auto 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; row-gap: 18px; }
+      .arch-node { padding: 18px 20px; border-radius: 14px; background: linear-gradient(180deg, #0d0f13, #14171d); border: 1px solid var(--line); text-align: center; min-width: 150px; transition: opacity 0.2s, transform 0.2s; }
+      .arch-node .an-label { font-weight: 700; font-size: clamp(14px, 1.7vw, 19px); color: var(--fg); }
+      .arch-node .an-sub { margin-top: 6px; font-size: clamp(11px, 1.2vw, 13px); color: var(--dim); font-weight: 650; line-height: 1.3; }
+      .arch-node.accent { border-color: var(--gold); }
+      .arch-node.dim { opacity: 0.55; border-color: #1c1e24; transform: scale(0.86); }
+      .arch-node.dim .an-label { font-size: clamp(12px, 1.4vw, 15px); }
+      .arch-arrow { display: flex; flex-direction: column; align-items: center; padding: 0 12px; flex-shrink: 0; }
+      .arch-arrow svg { width: 42px; height: 14px; display: block; }
+      .arch-arrow .al { font-size: 11px; color: var(--dim); font-weight: 700; margin-top: 4px; white-space: nowrap; letter-spacing: 0.02em; }
+      .arch-below { width: 100%; display: flex; justify-content: center; margin-top: 22px; }
+      .arch-below-line { width: min(500px, 70vw); border-top: 1px dashed #23252b; margin: 0 auto 10px; position: relative; }
+
+      /* Photo card: a real scan, shown as texture/evidence - never the source of a claimed number */
+      .photo-card { width: min(560px, 88vw); margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 24px 60px rgba(0,0,0,0.55); background: #0d0f13; }
+      .photo-card img { width: 100%; display: block; filter: contrast(1.03); }
+      .photo-caption { margin-top: 12px; font-size: clamp(11px, 1.3vw, 14px); color: var(--dim); font-weight: 650; text-align: center; letter-spacing: 0.01em; }
+
+      .reveal .progress { color: var(--gold); height: 4px; }
+      .reveal .controls { color: var(--dim); }
+      .reveal .slide-number { background: transparent; color: #3a3a3d; font-family: inherit; font-weight: 700; }
+
+      @media print { html, body, .reveal, .reveal .slides, .reveal .slides > section { background: #000 !important; } }
+    </style>
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- 1. Title (plan #1) - no on-screen subtitle, it's spoken -->
+        <section>
+          <p class="eyebrow">The Fifth Elephant</p>
+          <h2 class="huge">Good Enough<br><span class="accent">for What?</span></h2>
+          <aside class="notes">Good evening. I'm Prudhvi. Tonight's talk is called Good Enough for What. [let the title sit a moment before advancing]</aside>
+        </section>
+
+        <!-- 2. Cold open (plan #2) -->
+        <section>
+          <h2 class="big">Is the cheaper model<br>good enough?</h2>
+          <p class="sub">I've had to answer this <span class="accent">three times</span> this year.<br>I got it wrong, <span class="up">every single time</span>.</p>
+          <aside class="notes">Is the cheaper model good enough. I've had to answer that exact question three times this year, and I got it wrong on the first pass every single time. Not because the model was bad. Because I was reading the wrong number. Three different systems - an OCR engine, an embedding model, a vision verifier - nothing in common except the question. So I'll walk through the three, in order, and show you the number that fooled me each time.</aside>
+        </section>
+
+        <!-- 3. Case one setup: Tesseract (plan #3) -->
+        <section>
+          <p class="eyebrow">Case one &middot; a document pipeline</p>
+          <h2 class="big">Tesseract.</h2>
+          <p class="sub" style="margin-bottom: 28px;">Free. Local. No API cost.</p>
+          <div class="photo-card">
+            <img src="assets/tesseract-scan.jpg" alt="A real scanned government document page in Hindi, the kind of source material this benchmark runs on">
+          </div>
+          <p class="photo-caption">One real page from the corpus - not the page behind any number on this slide</p>
+          <div class="metric-panel" style="margin-top: 28px;">
+            <div class="metric-row" style="margin-bottom: 0;">
+              <span class="metric-label">Word accuracy, Hindi</span>
+              <div class="metric-track">
+                <span class="metric-tag" style="left: 46.7%; color: var(--down);">hosted 92-95</span>
+                <div class="metric-band" style="left: 46.7%; width: 20%;"></div>
+                <div class="metric-fill up" style="width: 33.5%;"></div>
+              </div>
+              <span class="metric-value up">90.03</span>
+            </div>
+          </div>
+          <aside class="notes">First case. This was a document pipeline - scanned government pages get OCR'd into a corpus, and every answer downstream has to trace back to the exact question it came from. So: Tesseract, a free, local OCR engine. Someone challenged me on a benchmark row - Tesseract was scoring 90.03 word accuracy on Hindi, against hosted frontier OCR models at 92 to 95. I re-ran it. It reproduced. The output read beside the ground truth is genuinely good Devanagari prose. I nearly shipped it.</aside>
+        </section>
+
+        <!-- 4. The check that mattered (plan #4) -->
+        <section>
+          <p class="eyebrow">The question I actually asked</p>
+          <h2 class="big">Could it still read<br>the question number?</h2>
+          <div class="code" style="text-align: center; margin-top: 44px;">expected&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;recovered
+*896.&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="bad circled">+896.</span>
+*897.&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="bad circled">#897.</span></div>
+          <p class="caption">The string that links a question to its answer.</p>
+          <p class="sub" style="font-size: clamp(15px, 1.7vw, 19px); color: var(--dim); margin-top: 14px;">A "junk token" - one invented character where the source has none. Rate on a genuine scan: <span class="up">2.2% -&gt; 5.2%</span>, and the junk lands exactly on the question numbers, circled above.</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Benchmark: word accuracy. Metric that mattered: can the question number survive.</p>
+          <aside class="notes">Word accuracy wasn't the number the product needed. The product needed the question number - the string that links a question to its answer. A junk token is one invented character where the source has none. On a genuine scanned page, the junk-token rate doubles, 2.2 percent to 5.2 percent, and the junk lands exactly on the question numbers. Star-896-period comes back as plus-896-period. Star-897 becomes hash-897. Same benchmark. Same model - just a different axis.</aside>
+        </section>
+
+        <!-- 5. The number (plan #5): question-number recovery, three bars -->
+        <section>
+          <div class="data-card">
+            <div class="data-head">
+              <div class="data-title">Question numbers recovered <span>&middot; recovery rate, by engine</span></div>
+              <div class="source"><span class="dot"></span>figures.md, question-number recovery</div>
+            </div>
+            <div id="recoveryChart"></div>
+          </div>
+          <p class="caption">Same benchmark. One axis called it close. This one didn't.</p>
+          <aside class="notes">Across the whole benchmark: Tesseract recovers 68 percent of question numbers on Hindi, 39 percent on English. Every hosted model recovers 100 percent. On word accuracy this looked like a coin flip - about two points separated ten engines across four providers. On the number that mattered, it wasn't close.</aside>
+        </section>
+
+        <!-- 6. Verdict: rejected (plan #6) -->
+        <section>
+          <h2 class="huge">Rejected.</h2>
+          <p class="sub">Same benchmark. Same model.<br>One number said <span class="accent">close call</span>.<br>The other said <span class="up">not close at all</span>.</p>
+          <aside class="notes">Rejected. Free and local wasn't the deciding factor. The metric everyone reports said close call. The metric the product actually depended on said not close at all. And if you want to reproduce this yourself with zero client data - there's a script in the repo that generates a synthetic Hindi page, runs the real Tesseract binary on it, and gets the same gap: word accuracy fine, question numbers gone.</aside>
+        </section>
+
+        <!-- 7. Case two setup: bge-m3 (plan #7) -->
+        <section>
+          <p class="eyebrow">Case two &middot; retrieval feeding generation</p>
+          <h2 class="big">bge-m3.</h2>
+          <p class="sub">Open. <span class="accent">~570M</span> parameters. One modest GPU.<br>Against hosted <span class="dim">text-embedding-3-small</span>.</p>
+          <aside class="notes">Second case. This is a retrieval system over that same bilingual Hindi-English archive - someone asks a question, we embed it, pull back the passage that answers it, and only that passage goes to generation. So: embeddings. bge-m3 is an open model, about 570 million parameters, runs on one modest GPU. I was comparing it against a hosted OpenAI embedding model, text-embedding-3-small.</aside>
+        </section>
+
+        <!-- 8. The diagnostic (plan #8): staged reveal, let the room spot the tell -->
+        <section>
+          <div class="photo-card" style="width: min(200px, 55vw); margin: 0 auto 10px;">
+            <img src="assets/tesseract-scan.jpg" alt="A real scanned page from the same bilingual Hindi-English archive this retrieval system runs on">
+          </div>
+          <p class="photo-caption" style="margin: 0 0 20px;">Same archive as case one - texture, not the actual retrieved passage</p>
+          <p class="eyebrow">The tell &middot; cosine similarity, hosted embedding model</p>
+          <div class="metric-panel">
+            <div class="metric-row fragment">
+              <span class="metric-label">distractor passage</span>
+              <div class="metric-track"><div class="metric-fill up" style="width: 82%;"></div></div>
+              <span class="metric-value up">0.328</span>
+            </div>
+            <div class="metric-row fragment">
+              <span class="metric-label">correct Hindi passage</span>
+              <div class="metric-track"><div class="metric-fill accent" style="width: 65.5%; background: var(--gold);"></div></div>
+              <span class="metric-value accent">0.262</span>
+            </div>
+            <div class="metric-row fragment">
+              <span class="metric-label">same content, in English</span>
+              <div class="metric-track"><div class="metric-fill cyan" style="width: 20.5%; background: var(--cyan);"></div></div>
+              <span class="metric-value cyan">0.082</span>
+            </div>
+          </div>
+          <p class="caption fragment">It understands English fine. In Devanagari, it fell back to surface token overlap.</p>
+          <aside class="notes">This is the same archive as case one - texture again, not the actual passage pair. Here's the tell - cosine similarity scores from the hosted embedding model. [reveal first two bars] It scored a distractor passage 0.328, and the actual correct Hindi passage 0.262 - it ranked the wrong answer higher. [reveal third bar] Same content, in English, scored 0.082. It understands English fine. In Devanagari it was falling back to surface token overlap - matching characters, not meaning.</aside>
+        </section>
+
+        <!-- 9. Pre-registered bar (plan #9) - the mechanism check, written down before running the test -->
+        <section>
+          <p class="eyebrow">Written down before I ran it</p>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 10px;">Beat the baseline.<br>Without cheating to do it.</h2>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin: 6px 0 0;">MRR: how high up the correct passage ranks, on average. A "hard negative": a wrong passage built to look right - the trap a model can pass by matching words instead of meaning.</p>
+          <div class="metric-panel" style="margin-top: 24px;">
+            <div class="metric-row gap">
+              <span class="metric-label">MRR, higher is better</span>
+              <div class="metric-track">
+                <span class="metric-tag" style="left: 80.6%; color: var(--gold);">win line 0.403</span>
+                <div class="metric-threshold" style="left: 80.6%;"></div>
+                <div class="metric-fill down" style="width: 92.2%;"></div>
+              </div>
+              <span class="metric-value down">0.461</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">hard-negative MRR, must stay low</span>
+              <div class="metric-track">
+                <span class="metric-tag" style="left: 74%; color: var(--gold);">ceiling 0.074</span>
+                <div class="metric-threshold" style="left: 74%;"></div>
+                <div class="metric-fill down" style="width: 20%;"></div>
+              </div>
+              <span class="metric-value down">0.020</span>
+            </div>
+          </div>
+          <p class="caption">Without the second bar, a model that wins by matching surface tokens still passes.</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Benchmark: beat the baseline on MRR. Metric that mattered: beat it without winning on hard negatives.</p>
+          <aside class="notes">MRR is how high up the correct passage ranks, on average - and a hard negative is a wrong passage built to look right, the trap a model can pass by matching words instead of meaning. It cleared a bar I'd written down before running it: beat 0.403 MRR while holding hard-negative MRR near 0.074 - a model that's just pattern-matching surface tokens would win on the first number and blow through the ceiling on the second. bge-m3 beat the win line at 0.461, and stayed well under the ceiling at 0.020. The benchmark here was just "beat the baseline on MRR." The metric that actually mattered was beating it without winning that way.</aside>
+        </section>
+
+        <!-- 10. Verdict: chosen (plan #10) -->
+        <section>
+          <h2 class="huge">Chosen.</h2>
+          <div class="metric-panel" style="margin-top: 30px;">
+            <div class="metric-row">
+              <span class="metric-label">bge-m3 recall@10</span>
+              <div class="metric-track"><div class="metric-fill down" style="width: 64.4%;"></div></div>
+              <span class="metric-value down">64.4</span>
+            </div>
+            <div class="metric-row gap">
+              <span class="metric-label">BM25 recall@10</span>
+              <div class="metric-track"><div class="metric-fill" style="width: 58.4%; background: var(--dim);"></div></div>
+              <span class="metric-value dim">58.4</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">bge-m3 MRR</span>
+              <div class="metric-track"><div class="metric-fill down" style="width: 92.2%;"></div></div>
+              <span class="metric-value down">0.461</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">BM25 MRR</span>
+              <div class="metric-track"><div class="metric-fill" style="width: 80.6%; background: var(--dim);"></div></div>
+              <span class="metric-value dim">0.403</span>
+            </div>
+          </div>
+          <aside class="notes">Chosen. bge-m3 separated them correctly - recall at 10: 64.4 versus 58.4 for BM25. MRR: 0.461 versus 0.403.</aside>
+        </section>
+
+        <!-- 11. Case three setup: SAM 3.1 (plan #11) -->
+        <section>
+          <p class="eyebrow">Case three &middot; grading CCTV compliance</p>
+          <h2 class="big">SAM 3.1.</h2>
+          <p class="sub">Frontier model <span class="cyan">proposes</span>.<br>Self-hosted SAM 3.1 <span class="accent">verifies</span> every cited frame.</p>
+          <div class="photo-card" style="width: min(320px, 70vw); margin: 18px auto 0;">
+            <img src="assets/warehouse-safety.jpg" alt="An overhead warehouse camera view from a public dataset, illustrating the kind of top-down CCTV coverage this case is about">
+          </div>
+          <p class="photo-caption">Not the client's footage or facility - a public overhead-warehouse dataset, same kind of coverage. "Warehouse Safety" dataset (CC BY 4.0), 's Workspace / Roboflow Universe.</p>
+          <div class="arch">
+            <div class="arch-node"><div class="an-label">Frontier model</div><div class="an-sub">reads footage,<br>cites frames</div></div>
+            <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg><span class="al">cites</span></div>
+            <div class="arch-node accent"><div class="an-label">SAM 3.1</div><div class="an-sub">self-hosted,<br>one GPU</div></div>
+            <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg><span class="al">verifies</span></div>
+            <div class="arch-node"><div class="an-label">Interface</div><div class="an-sub">shows only what's<br>defended</div></div>
+          </div>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Self-hosted wasn't a preference - the client's rule was that CCTV footage doesn't leave their infrastructure to any hosted model.</p>
+          <aside class="notes">Third case, a different system entirely. This started as a manual process - someone watching CCTV footage by hand to check compliance - and we proposed automating it with AI. That's not the client's footage, by the way - I can't show that - it's a public dataset, same kind of overhead coverage, different facility. A frontier model reads the footage and grades compliance against the client's own rulebook - and that grade drives a real decision, so a wrong one has consequences. There was also a hard constraint going in: the client didn't want raw CCTV footage leaving their infrastructure to any hosted model, so whatever checked the frontier model's citations had to run locally too. That's why SAM 3.1, self-hosted on one workstation GPU, cross-checking every frame it cited before anything reached a person. Frontier proposes, small model verifies. It's a good pattern. I still believe in it.</aside>
+        </section>
+
+        <!-- 12. Measured three ways, lost all three (plan #12) -->
+        <section>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 4px;">Measured three ways.<br>Lost all three.</h2>
+          <p class="caption" style="margin-top: 4px; margin-bottom: 2px; font-size: clamp(14px, 1.6vw, 19px); color: var(--dim);">disagreed with the frontier model, 38 of 65 scored checks - most were its own prompt bugs, not real disagreements</p>
+          <div class="prop-bar">
+            <div class="seg" style="left: 0; width: 58.5%; background: var(--up);"></div>
+            <div class="seg" style="left: 58.5%; width: 41.5%; background: #2a2d35;"></div>
+          </div>
+          <div class="prop-legend"><span><i style="background: var(--up);"></i>disagreed, 38</span><span><i style="background: #2a2d35;"></i>agreed, 27</span></div>
+          <div class="compare2" style="margin: 26px auto 0; gap: 14px;">
+            <div class="cbox" style="padding: 14px 18px; min-width: 180px; text-align: center;">
+              <div class="clabel">SAM detected</div>
+              <div class="cvalue" style="font-size: clamp(20px, 2.6vw, 28px);">00:00:02</div>
+            </div>
+            <div class="cbox" style="padding: 14px 18px; min-width: 180px; text-align: center; border-color: var(--up);">
+              <div class="clabel">Ground truth</div>
+              <div class="cvalue" style="font-size: clamp(20px, 2.6vw, 28px); color: var(--up);">00:25:00</div>
+            </div>
+          </div>
+          <p class="caption" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 8px;">Worst of three sessions on conveyor timing - wrong on all three, by up to 25 minutes.</p>
+          <div class="metric-panel" style="margin-top: 20px;">
+            <div class="metric-row" style="margin-bottom: 4px;">
+              <span class="metric-label" style="font-size: 13px; color: var(--dim);">threshold set at</span>
+              <div class="metric-track" style="background: transparent; height: 0;">
+                <span class="dot-marker" style="left: 50%; background: var(--dim);"></span>
+                <span class="dot-marker" style="left: 66.7%; background: var(--dim);"></span>
+                <span class="dot-marker" style="left: 83.3%; background: var(--dim);"></span>
+              </div>
+              <span class="metric-value" style="visibility: hidden;">.</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label" style="font-size: 13px; color: var(--dim);">score that fired</span>
+              <div class="metric-track" style="background: #161820; height: 6px;">
+                <span class="dot-marker" style="left: 52.7%; background: var(--up);"></span>
+                <span class="dot-marker" style="left: 52%; background: var(--up);"></span>
+                <span class="dot-marker" style="left: 71.3%; background: var(--up);"></span>
+              </div>
+              <span class="metric-value" style="visibility: hidden;">.</span>
+            </div>
+          </div>
+          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px); margin-top: 22px;">Thresholds hand-set at 0.15 / 0.2 / 0.25. Firing scores sat barely above whichever floor admitted them.</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Benchmark instinct: does it agree with the frontier model. Metric that mattered: is it right against independent ground truth.</p>
+          <aside class="notes">I measured it three ways. It disagreed with the frontier model on 38 of 65 scored checks - and most of those disagreements turned out to be its own prompt bugs, not real disagreements. That's the trap: agreement-with-the-frontier-model looks like a benchmark, but it isn't the metric that matters. Against human ground truth on conveyor timing, it was wrong on all three sessions - the worst miss by 25 minutes. And its confidence threshold was hand-set at three different values across three files, with the detections that fired sitting barely above whichever floor let them in.</aside>
+        </section>
+
+        <!-- 13. Threshold sweep (plan #13) -->
+        <section>
+          <p class="eyebrow">The obvious objection: bad threshold, not a bad model</p>
+          <div class="data-card">
+            <div class="data-head">
+              <div class="data-title">Minutes from ground truth <span>&middot; same prompt, three sessions</span></div>
+              <div class="source"><span class="dot"></span>figures.md, threshold sweep, run 2026-08-05</div>
+            </div>
+            <div id="sweepChart"></div>
+          </div>
+          <p class="caption">Peak scores: <span class="accent">0.226 to 0.586</span>. Same prompt. Same object class.</p>
+          <aside class="notes">Costs nothing to check - the scans kept every detection and score, so I re-ran the sweep offline. At 0.25, session A lands within 30 seconds of ground truth. Session B at 0.25 is 25 minutes early; raise the threshold to 0.35, it swings to 13 minutes early; raise it to 0.40, 70 minutes late - nothing usable in between. Session C never scores above 0.226 in the entire recording - above that, it detects nothing, ever. Peak scores range from 0.226 to 0.586 for the exact same prompt, same object class. The scores aren't comparable across sessions, so a global threshold isn't a coherent idea here.</aside>
+        </section>
+
+        <!-- 14. Verdict: demoted (plan #14) -->
+        <section>
+          <h2 class="huge" style="font-size: clamp(70px, 16vw, 220px);">Demoted.</h2>
+          <div class="grid3">
+            <span class="rlabel">Best config<br>in the sweep</span>
+            <div class="cells">
+              <span class="cell ok">correct</span><span class="cell no">wrong</span><span class="cell no">wrong</span>
+            </div>
+            <span class="rlabel">Excluding its<br>output instead</span>
+            <div class="cells">
+              <span class="cell ok">correct</span><span class="cell ok">correct</span><span class="cell no">wrong</span>
+            </div>
+          </div>
+          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px); margin-top: 22px;">No threshold beat excluding it. So it stopped deciding - and kept running in the background.</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Not a tuning problem - no cutoff fixes a detector answering the wrong question.</p>
+          <aside class="notes">Demoted. I tried every operating point in the sweep. Best case: one session out of three, correct. Excluding its output instead: two out of three, correct. That's what took it out of the verdict - it stopped being trusted alone, but it kept running. And this wasn't a tuning problem - no confidence cutoff fixes a detector that's answering the wrong question. What was missing wasn't a better threshold, it was judgment: something that could read the same evidence and reason about it, not just score it against a fixed number.</aside>
+        </section>
+
+        <!-- 15. Third layer setup (plan #15) -->
+        <section>
+          <p class="eyebrow">Then a third layer</p>
+          <h2 class="big" style="font-size: clamp(28px, 4vw, 48px);">A Claude adjudicator,<br>over both.</h2>
+          <div class="arch" style="margin-top: 34px;">
+            <div class="arch-node"><div class="an-label">Frontier model</div><div class="an-sub">cites frames</div></div>
+            <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg></div>
+            <div class="arch-node accent"><div class="an-label">Claude adjudicator</div><div class="an-sub">checker, not detector -<br>downgrades, never upgrades</div></div>
+            <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg></div>
+            <div class="arch-node"><div class="an-label">Interface</div><div class="an-sub">what the user<br>sees</div></div>
+          </div>
+          <div class="arch-below">
+            <div class="arch-node dim"><div class="an-label">SAM 3.1</div><div class="an-sub">demoted - a grey trace line</div></div>
+          </div>
+          <div class="assets" style="margin-top: 22px;">
+            <div class="asset"><code>132 calls</code><span class="what">about 17 seconds each, about $1.50 total</span></div>
+          </div>
+          <aside class="notes">So why an adjudicator, and why not from the start? Because the frontier model alone couldn't be trusted, and SAM alone turned out to be a fixed-threshold detector with no way to reason about context - tuning it couldn't fix that. What was actually missing was judgment, applied after both cheaper layers had already run and shown their limits. So: a Claude adjudicator, added over both the frontier model and SAM 3.1, became the primary signal a user actually saw - the small model demoted to a grey trace line. Its contract was disciplined: a checker, not a detector, allowed to downgrade severity but never upgrade it. 132 calls, about 17 seconds each, about a dollar fifty total.</aside>
+        </section>
+
+        <!-- 16. The canonical win that wasn't (plan #16) -->
+        <section>
+          <p class="eyebrow">The canonical win, written up that same evening</p>
+          <div class="compare2">
+            <div class="cbox">
+              <div class="clabel">SME ground truth, independent</div>
+              <div class="cvalue">00:25:00</div>
+              <div class="cnote">Recorded before the model ran. Disagrees with the frontier model on a different session, so it isn't a copy of it.</div>
+            </div>
+            <div class="cbox">
+              <div class="clabel">Verifier rule 3, mandated</div>
+              <div class="cvalue" style="color: var(--up);">"Could not be confirmed"</div>
+              <div class="cnote">Timestamp claims must return unverifiable absent a burnt-in clock - rule 3 names <span class="cyan">00:25:00</span> as its own example.</div>
+            </div>
+          </div>
+          <p class="caption">The verdict was fixed before the model saw a pixel.</p>
+          <aside class="notes">Its canonical win, written up the same evening, was catching a hallucinated conveyor timestamp of 00:25:00. Except 00:25:00 was correct - confirmed by SME ground truth, recorded independently. And the verifier had a rule stating timestamp claims must be returned unverifiable unless a clock is burnt into the frame, using this exact timestamp as its own worked example. The verdict was fixed before the model saw a pixel, and so was the sentence announcing it.</aside>
+        </section>
+
+        <!-- 17. Punchline (plan #17) -->
+        <section>
+          <h2 class="big">A rule-produced category<br>got read as <span class="up">a finding</span>.</h2>
+          <p class="sub">"Could not be confirmed" - read as <span class="up">"caught."</span></p>
+          <aside class="notes">A three-valued verifier had been collapsed to two values by the humans reading it, and "could not confirm" got filed as "caught." A category produced by rule rather than evidence is a constant. And a constant read as a signal is the purest way to measure nothing while feeling well-instrumented.</aside>
+        </section>
+
+        <!-- 18. The pattern across all three (plan #18) -->
+        <section>
+          <p class="eyebrow">Not the same mistake</p>
+          <h2 class="big" style="font-size: clamp(28px, 4vw, 48px);">Three different failures.</h2>
+          <div class="chips">
+            <span class="chip">OCR: wrong metric</span>
+            <span class="chip">Embeddings: wrong slice</span>
+            <span class="chip">Verifier: faulty evaluator</span>
+          </div>
+          <p class="caption">One thing in common: <span class="accent">the evaluation signal didn't represent the production question.</span></p>
+          <p class="caption" style="margin-top: 10px;">Every public number here was <span class="accent">directional</span>, not decisive - what caught each failure was a check I built for that task, not a bigger benchmark.</p>
+          <aside class="notes">These are three different failures, not the same mistake - OCR was the wrong metric, embeddings was the wrong evaluation slice, the verifier was a faulty evaluator. What's actually common across all three: the evaluation signal didn't represent the production question. That's the thing to check for, before you trust any number. And notice what all three fixes have in common: none of them was a better public benchmark. Word accuracy, cosine similarity on a standard eval set, agreement-with-a-frontier-model - all directionally useful, none of them decisive. What caught the failure, every time, was a small, task-specific check I built myself. That's the actual argument for having your own internal benchmark: not instead of public ones, but because a public benchmark tells you the model is in the right neighborhood, and only your own check tells you if it does the one thing your product needs.</aside>
+        </section>
+
+        <!-- 19. The honest complication (plan #19) - effect size / the model was rarely the lever -->
+        <section>
+          <p class="eyebrow">The honest complication</p>
+          <h2 class="big" style="font-size: clamp(28px, 4vw, 48px);">The model was rarely<br>the lever.</h2>
+          <div class="assets">
+            <div class="asset"><code>~2 points</code><span class="what">separated the entire ten-engine OCR field</span></div>
+            <div class="asset"><code>3-4x</code><span class="what">Hindi misread improved, from one font-table fix - on all ten engines at once</span></div>
+          </div>
+          <p class="caption">If the question was whether a smaller model was good enough, that comparison is the answer. It was never about the model.</p>
+          <p class="caption" style="margin-top: 10px; color: var(--dim);">Every Hindi score I'd published before that fix was measured against a corrupted answer key. The numbers were wrong. No decision made on them was.</p>
+          <aside class="notes">One honest complication, so this doesn't collapse into "just pick the right metric." In the OCR case, the entire ten-engine field - all four providers - spanned about two points of word accuracy. One correction to a font table improved Hindi misread three to four times, on all ten engines at once. If the question was whether a smaller or cheaper model was good enough, that comparison is the answer, and it was never about the model - it was a data-layer fix that dwarfed every model difference in the field. And the counterweight, so I'm not overclaiming rigor I didn't have: every Hindi score I'd published before that correction was measured against a corrupted answer key. The numbers were wrong. The rank order of all ten engines, and every decision taken on it, wasn't.</aside>
+        </section>
+
+        <!-- 20. The bound (plan #20) - captured output from a real, runnable artifact; not live -->
+        <section>
+          <p class="eyebrow" style="margin-bottom: 14px;">A runnable artifact, not a diagram</p>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 44px); margin-bottom: 18px;">The bound, on one page.</h2>
+          <div class="data-card code-card" style="padding: 16px 22px 12px;">
+            <div class="term-head" style="margin-bottom: 8px;">
+              <span class="term-dot" style="background:#ff5f56;"></span>
+              <span class="term-dot" style="background:#f5a623;"></span>
+              <span class="term-dot" style="background:#30d158;"></span>
+            </div>
+            <div class="code"><span class="prompt">$</span> uv run --script metric_blindspot.py
+
+<span class="c1">the metric everyone reports</span>
+  character error rate    0.0340
+  reads as                <span class="good">96.6% accurate</span>
+  edits                   79 over 2322 characters
+
+<span class="c1">the metric the task needs</span>
+  identifiers expected    5
+  identifiers recovered   <span class="bad">0</span>
+  identifier recall       <span class="bad">0.0%</span>
+  lost                    1247, 1251, 1268, 1273, 1289
+
+<span class="c1">why the first number could not have caught it</span>
+  identifiers are 20 of 2322 characters, <span class="gold">0.86%</span> of the page
+  so CER can move at most <span class="gold">0.86 points</span> between every identifier
+  being perfect and every identifier being destroyed
+  identifier recall moved <span class="bad">100 points</span> on this same page</div>
+          </div>
+          <div class="prop-bar" style="height: 16px; margin-top: 24px;">
+            <div class="seg" style="left: 0; width: 0.86%; background: var(--gold);"></div>
+            <div class="seg" style="left: 0.86%; width: 99.14%; background: #2a2d35;"></div>
+          </div>
+          <p class="caption" style="font-size: clamp(16px, 2vw, 26px); margin-top: 14px;">Identifiers are <span class="accent">0.86%</span> of the page. Compute that ratio on your own corpus - that's the bound, before you run anything.</p>
+          <aside class="notes">This is a small, runnable artifact - metric_blindspot.py, in the repo, no dependencies, no network, no model. Not running it live tonight, but it takes thirty seconds and no setup if you want to see it yourself afterward. The gold sliver is the identifier characters: 0.86 percent of the page. Compute identifier_chars over total_chars on your own corpus, and you have this bound before you run anything.</aside>
+        </section>
+
+        <!-- 21. Takeaways (plan #21) - the one slide allowed bullets, lifted from abstract.md -->
+        <section>
+          <p class="eyebrow">Takeaways</p>
+          <div style="width: min(880px, 92vw); margin: 0 auto; text-align: left;">
+            <p class="sub" style="color: var(--dim); font-style: italic; font-weight: 500; font-size: clamp(15px, 1.7vw, 19px); margin: 0 0 28px;">
+              Picking the number before you benchmark is the baseline. Two things past that:
+            </p>
+            <p class="sub" style="color: var(--fg); font-weight: 700; font-size: clamp(24px, 3vw, 38px); margin: 0 0 10px;">
+              1. The model was rarely the lever.
+            </p>
+            <p class="sub" style="font-size: clamp(16px, 1.9vw, 21px); margin: 0 0 40px;">
+              <span class="accent">~2 points</span> across ten engines &middot; one font-table fix moved it <span class="accent">3-4x</span>.
+            </p>
+            <p class="sub" style="color: var(--fg); font-weight: 700; font-size: clamp(24px, 3vw, 38px); margin: 0 0 10px;">
+              2. The verifier's cleanest win can be its own rule.
+            </p>
+            <p class="sub" style="font-size: clamp(16px, 1.9vw, 21px); margin: 0;">
+              "Unverifiable by policy" filed as "caught a hallucination."
+            </p>
+          </div>
+          <aside class="notes">Picking the number before you benchmark is the baseline - you already know that one. Two things past it. One: the model was rarely the actual lever. Ten OCR engines spanned about two points of accuracy - one font-table fix moved Hindi misread three to four times, on all ten engines, at once. Half of this talk was a model comparison. Check whether the leverage is even in the model before you spend that effort on the comparison. Two: a verifier's most confident-looking catch can be its own rule firing, not a finding - "unverifiable by policy" got filed by a person as "caught a hallucination," on a timestamp that was actually correct. If you're stacking a verifier on a verifier - which is exactly what an agent harness is - the cleanest, most reassuring-looking catch is the one most worth doubting.</aside>
+        </section>
+
+        <!-- 22. Close (plan #22) -->
+        <section>
+          <h2 class="big">Good enough <span class="accent">for what?</span></h2>
+          <p class="sub">Ask what would make you reject it, and what would make you accept it - before you run the benchmark that tells you to keep it.</p>
+          <aside class="notes">So back to the title. Good enough for what. Ask what would make you reject it - and ask what would make you accept it - before you run the benchmark that tells you to keep it. Thank you.</aside>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="vendor/reveal.js"></script>
+    <script src="vendor/plugin/notes/notes.js"></script>
+    <script>
+      /* Question-number recovery: three static bars, real numbers from figures.md. */
+      (function () {
+        const el = document.getElementById("recoveryChart");
+        if (!el) return;
+
+        const rows = [
+          { label: "Hindi (Tesseract)", value: 68, color: "#ff5f56" },
+          { label: "English (Tesseract)", value: 39, color: "#ff5f56" },
+          { label: "Hosted models", value: 100, color: "#30d158" },
+        ];
+
+        const W = 1000, H = 360, L = 210, R = 70, T = 30, B = 300;
+        const x = (v) => L + (v / 100) * (W - L - R);
+
+        const svg = [];
+        svg.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Question-number recovery rate by engine">`);
+        [0, 25, 50, 75, 100].forEach((v) => {
+          svg.push(`<line x1="${x(v)}" y1="${T}" x2="${x(v)}" y2="${B}" stroke="#1a1c22" stroke-width="1"/>`);
+          svg.push(`<text x="${x(v)}" y="${B + 24}" text-anchor="middle" fill="#6b6d73" font-size="14">${v}%</text>`);
+        });
+
+        const rowH = (B - T) / rows.length;
+        rows.forEach((row, i) => {
+          const cy = T + rowH * i + rowH / 2;
+          const barH = 34;
+          svg.push(`<text x="${L - 18}" y="${cy + 5}" text-anchor="end" fill="#f5f5f7" font-size="18" font-weight="650">${row.label}</text>`);
+          svg.push(`<rect x="${L}" y="${cy - barH / 2}" width="${(x(row.value) - L).toFixed(1)}" height="${barH}" rx="6" fill="${row.color}" opacity="0.9"/>`);
+          svg.push(`<text x="${x(row.value) + 14}" y="${cy + 6}" fill="${row.color}" font-size="22" font-weight="800">${row.value}%</text>`);
+        });
+
+        svg.push(`</svg>`);
+        el.innerHTML = svg.join("");
+      })();
+
+      /* Threshold sweep: minutes-from-truth per session, per threshold. Real numbers,
+         figures.md "Threshold sweep, run 2026-08-05". Session C never fires, so it gets
+         a note instead of a point - there is no time to plot. */
+      (function () {
+        const el = document.getElementById("sweepChart");
+        if (!el) return;
+
+        const W = 1000, H = 320, L = 150, R = 40, T = 26, B = 250;
+        const xMin = -40, xMax = 80;
+        const x = (m) => L + ((m - xMin) / (xMax - xMin)) * (W - L - R);
+
+        const svg = [];
+        svg.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Minutes from ground truth, by session and threshold">`);
+
+        [-40, -20, 0, 20, 40, 60, 80].forEach((m) => {
+          svg.push(`<line x1="${x(m)}" y1="${T}" x2="${x(m)}" y2="${B}" stroke="#1a1c22" stroke-width="1"/>`);
+          svg.push(`<text x="${x(m)}" y="${B + 22}" text-anchor="middle" fill="#6b6d73" font-size="13">${m > 0 ? "+" : ""}${m}</text>`);
+        });
+        svg.push(`<line x1="${x(0)}" y1="${T}" x2="${x(0)}" y2="${B}" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 5"/>`);
+        svg.push(`<text x="${x(0)}" y="${T - 8}" text-anchor="middle" fill="var(--gold)" font-size="13" font-weight="700">ground truth</text>`);
+
+        const rows = [
+          { y: T + (B - T) * 0.2, label: "Session A" },
+          { y: T + (B - T) * 0.55, label: "Session B" },
+          { y: T + (B - T) * 0.88, label: "Session C" },
+        ];
+        rows.forEach((r) => svg.push(`<text x="${L - 16}" y="${r.y + 5}" text-anchor="end" fill="#f5f5f7" font-size="17" font-weight="650">${r.label}</text>`));
+
+        // Session A: one point, within 30s of truth
+        const ay = rows[0].y;
+        svg.push(`<circle cx="${x(-0.5)}" cy="${ay}" r="7" fill="var(--down)"/>`);
+        svg.push(`<text x="${x(-0.5)}" y="${ay - 16}" text-anchor="middle" fill="var(--down)" font-size="13" font-weight="700">@0.25</text>`);
+
+        // Session B: three points across thresholds, connected in threshold order
+        const by = rows[1].y;
+        const bPts = [{ m: -25, t: "0.25" }, { m: -13, t: "0.35" }, { m: 70, t: "0.40" }];
+        let bl = ""; bPts.forEach((p, i) => bl += (i === 0 ? "M" : "L") + x(p.m).toFixed(1) + "," + by + " ");
+        svg.push(`<path d="${bl}" fill="none" stroke="var(--up)" stroke-width="2" stroke-dasharray="3 5"/>`);
+        bPts.forEach((p) => {
+          svg.push(`<circle cx="${x(p.m).toFixed(1)}" cy="${by}" r="7" fill="var(--up)"/>`);
+          svg.push(`<text x="${x(p.m).toFixed(1)}" y="${by - 16}" text-anchor="middle" fill="var(--up)" font-size="13" font-weight="700">@${p.t}</text>`);
+        });
+
+        // Session C: never fires above 0.226, so a note instead of a point
+        const cy = rows[2].y;
+        svg.push(`<line x1="${L}" y1="${cy}" x2="${W - R}" y2="${cy}" stroke="#23252b" stroke-width="1" stroke-dasharray="2 6"/>`);
+        svg.push(`<text x="${(L + W - R) / 2}" y="${cy - 12}" text-anchor="middle" fill="#8a8d94" font-size="14" font-weight="650">never fires above 0.226, at any threshold</text>`);
+
+        svg.push(`</svg>`);
+        el.innerHTML = svg.join("");
+      })();
+
+      Reveal.initialize({
+        hash: true,
+        controls: true,
+        controlsTutorial: false,
+        progress: true,
+        slideNumber: "c/t",
+        center: true,
+        transition: "fade",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0.06,
+        plugins: [RevealNotes],
+      });
+    </script>
+  </body>
+</html>

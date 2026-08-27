@@ -1,0 +1,9 @@
+# Backstage material - not for the public repo. abstract.md stays (it's
+# already public on hasgeek); index.html, vendor/, assets/, artifact/ are
+# the actual deliverable and stay too.
+figures.md
+speaker-notes.md
+talk-notes.md
+slide-plan.md
+todo.md
+review-transcript-*.md
