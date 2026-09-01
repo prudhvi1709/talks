@@ -1,33 +1,16 @@
 # Talk Drafts
 
-- Here I will maintain the drafts of the talks, which I will be giving at various conferences.
+Drafts, slides, and supporting material for talks and workshops. Browse the
+visual index at [index.html](https://prudhvi1709.github.io/talks/), or the
+table below - each talk's own README has the full detail (video, transcript,
+structure).
 
 ## Presentations
 
-### Straive Convergence - 2026
-**Title:** AI Works For Me
-
-- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/ai-works-for-me/)
-- **Video:** Not available yet
-- **Transcript:** Not available yet
-
-### IDC Hyderabad Workshop - Apr 25, 2026
-**Title:** Build and Ship: Applied AI in Action
-
-- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/IDC-25-04-2026/idc-workshop.html)
-- **Video:** Not available yet
-- **Transcript:** Not available yet
-
-### Hyderabad Python Meetup - Dec 20, 2025
-**Title:** LLM-Powered Data Engineering: Automating Schemas, Ingestion and Quality
-
-- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/Hydpy-20-12-2025/index.html)
-- **Video:** https://www.youtube.com/watch?v=nclyldi9b0Q
-- **Transcript:** [Read Transcript](https://prudhvi1709.github.io/talks/Hydpy-20-12-2025/transcript-hydpy.md)
-
-### Hasgeek Conference - Nov 1, 2025
-**Title:** AI as Your Co-Developer: Automating Schemas, Quality Checks, Ingestion & Hypothesis Testing
-
-- **Presentation:** [View Presentation](https://prudhvi1709.github.io/talks/Hasgeek-01-11-2025/index.html)
-- **Video:** https://www.youtube.com/watch?v=hh6qoCQeHtc&t=18120s
-- **Transcript:** [Read Transcript](https://prudhvi1709.github.io/talks/Hasgeek-01-11-2025/transcript.md)
+| Talk                                                    | Conference                             | Slides                                                                         | Video                                                         | Transcript                                         |
+| ------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- | -------------------------------------------------- |
+| [Good Enough for What?](fifthel-05-09-2026/)            | The Fifth Elephant - TBD               | [Slides](https://prudhvi1709.github.io/talks/fifthel-05-09-2026/index.html)    | -                                                             | -                                                  |
+| [AI Works For Me](ai-works-for-me/)                     | Straive Convergence - 2026             | [Slides](https://prudhvi1709.github.io/talks/ai-works-for-me/)                 | -                                                             | -                                                  |
+| [Build and Ship: Applied AI in Action](IDC-25-04-2026/) | IDC Hyderabad Workshop - Apr 25, 2026  | [Slides](https://prudhvi1709.github.io/talks/IDC-25-04-2026/idc-workshop.html) | -                                                             | -                                                  |
+| [LLM-Powered Data Engineering](Hydpy-20-12-2025/)       | Hyderabad Python Meetup - Dec 20, 2025 | [Slides](https://prudhvi1709.github.io/talks/Hydpy-20-12-2025/index.html)      | [Video](https://www.youtube.com/watch?v=nclyldi9b0Q)          | [Transcript](Hydpy-20-12-2025/transcript-hydpy.md) |
+| [AI as Your Co-Developer](Hasgeek-01-11-2025/)          | Hasgeek Conference - Nov 1, 2025       | [Slides](https://prudhvi1709.github.io/talks/Hasgeek-01-11-2025/index.html)    | [Video](https://www.youtube.com/watch?v=hh6qoCQeHtc&t=18120s) | [Transcript](Hasgeek-01-11-2025/transcript.md)     |
