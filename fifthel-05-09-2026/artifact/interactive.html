@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metric blind spot - try it yourself</title>
+<style>
+  :root {
+    --bg: #050608;
+    --fg: #f5f5f7;
+    --dim: #86868b;
+    --line: #23252b;
+    --up: #ff5f56;
+    --down: #30d158;
+    --gold: #f5a623;
+    --cyan: #4cc2ff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  body { padding: 28px 20px 60px; }
+  main { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: clamp(22px, 4vw, 32px); margin: 0 0 6px; }
+  p.lede { color: var(--dim); font-size: clamp(14px, 2vw, 16px); line-height: 1.5; margin: 0 0 28px; }
+  p.lede code { color: var(--fg); }
+  section.field { margin-bottom: 20px; }
+  label { display: block; font-size: 13px; color: var(--dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  textarea, input[type="text"] {
+    width: 100%;
+    background: #0d0e11;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font: 13px/1.6 "SF Mono", "Menlo", "Consolas", monospace;
+    resize: vertical;
+  }
+  textarea { height: 220px; }
+  input[type="text"] { height: 40px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > section.field { flex: 1 1 320px; }
+  .actions { display: flex; gap: 12px; margin: 4px 0 32px; }
+  button {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--dim); }
+  .data-card {
+    background: #0d0e11;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 22px 20px;
+  }
+  .term-head { display: flex; gap: 6px; margin-bottom: 12px; }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .code { font: 13px/1.7 "SF Mono", "Menlo", "Consolas", monospace; white-space: pre-wrap; word-break: break-word; }
+  .code .c1 { color: var(--cyan); }
+  .code .good { color: var(--down); }
+  .code .bad { color: var(--up); }
+  .code .gold { color: var(--gold); }
+  .warn { color: var(--up); font-size: 13px; margin-top: 10px; }
+  footer { margin-top: 40px; color: var(--dim); font-size: 12px; line-height: 1.6; }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Does your metric have the same blind spot?</h1>
+  <p class="lede">
+    Character error rate averages over every character on the page. Edit the truth
+    and OCR text below (or paste your own), and watch character error rate barely move
+    while identifier recall does the opposite. This runs entirely in your browser -
+    the same algorithm as <code>metric_blindspot.py</code>, no install, no network call.
+  </p>
+
+  <section class="field">
+    <label for="pattern">Identifier pattern (regex; first capture group used, or the whole match)</label>
+    <input type="text" id="pattern" autocomplete="off" spellcheck="false">
+  </section>
+
+  <div class="row">
+    <section class="field">
+      <label for="truth">Truth (ground truth text)</label>
+      <textarea id="truth" spellcheck="false"></textarea>
+    </section>
+    <section class="field">
+      <label for="ocr">OCR output</label>
+      <textarea id="ocr" spellcheck="false"></textarea>
+    </section>
+  </div>
+
+  <div class="actions">
+    <button id="reset" type="button">Reset to original</button>
+  </div>
+
+  <div class="data-card">
+    <div class="term-head">
+      <span class="term-dot" style="background:#ff5f56;"></span>
+      <span class="term-dot" style="background:#f5a623;"></span>
+      <span class="term-dot" style="background:#30d158;"></span>
+    </div>
+    <div class="code" id="output"></div>
+    <div class="warn" id="warning" hidden></div>
+  </div>
+
+  <footer>
+    Ported line-for-line from
+    <a href="https://raw.githubusercontent.com/prudhvi1709/talks/main/fifthel-05-09-2026/artifact/metric_blindspot.py" target="_blank" rel="noopener noreferrer">metric_blindspot.py</a>
+    - same normalization, same Levenshtein distance, same identifier-recovery check.
+    <br>
+    <a href="https://github.com/prudhvi1709/talks" target="_blank" rel="noopener noreferrer">github.com/prudhvi1709/talks</a>
+  </footer>
+</main>
+
+<script>
+"use strict";
+
+const DEFAULT_PATTERN = "Question No\\.\\s*(\\d+)";
+
+const DEFAULT_TRUTH = `विधान सभा सचिवालय / LEGISLATIVE ASSEMBLY SECRETARIAT
+तारांकित प्रश्नों की सूची — पंचम सत्र
+
+Question No. 1247
+Department: Health and Family Welfare
+प्रश्न: क्या स्वास्थ्य मंत्री यह बताने की कृपा करेंगे कि राज्य के ग्रामीण
+क्षेत्रों में संचालित प्राथमिक स्वास्थ्य केंद्रों की कुल संख्या कितनी है, तथा
+उनमें से कितने केंद्र वर्तमान में नियमित चिकित्सकों की कमी से प्रभावित हैं?
+उत्तर: राज्य में कुल एक हजार आठ सौ निन्यानबे प्राथमिक स्वास्थ्य केंद्र
+संचालित हैं। इनमें से चार सौ बारह केंद्रों में नियमित चिकित्सक पदस्थापित
+नहीं हैं। रिक्त पदों पर नियुक्ति की प्रक्रिया संविदा के आधार पर प्रचलित है।
+
+Question No. 1251
+Department: Rural Development
+प्रश्न: क्या ग्रामीण विकास मंत्री यह बताने की कृपा करेंगे कि विगत तीन वर्षों
+में स्वीकृत ग्रामीण सड़क परियोजनाओं में से कितनी परियोजनाएं निर्धारित
+समयसीमा के भीतर पूर्ण की गई हैं तथा विलंब के प्रमुख कारण क्या रहे हैं?
+उत्तर: कुल स्वीकृत परियोजनाओं में से लगभग दो तिहाई परियोजनाएं निर्धारित
+अवधि में पूर्ण हुईं। शेष में विलंब का प्रमुख कारण भूमि अधिग्रहण संबंधी
+विवाद तथा वर्षा ऋतु में कार्य स्थगन रहा है।
+
+Question No. 1268
+Department: Education
+प्रश्न: क्या शिक्षा मंत्री यह बताने की कृपा करेंगे कि राज्य के उच्च
+विद्यालयों में विज्ञान विषय के शिक्षकों के कितने पद रिक्त हैं तथा इन पदों
+को भरने हेतु विभाग द्वारा क्या कार्रवाई की जा रही है?
+उत्तर: विज्ञान विषय के शिक्षकों के रिक्त पदों की गणना जिलावार की गई है।
+नियुक्ति हेतु अधियाचना आयोग को भेजी जा चुकी है तथा चयन प्रक्रिया
+वर्तमान वित्तीय वर्ष के भीतर पूर्ण किए जाने का लक्ष्य निर्धारित है।
+
+Question No. 1273
+Department: Water Resources
+प्रश्न: क्या जल संसाधन मंत्री यह बताने की कृपा करेंगे कि तटबंधों के
+सुदृढ़ीकरण हेतु विगत वर्ष में कितनी राशि व्यय की गई तथा वर्तमान में कितने
+तटबंध मरम्मत की प्रतीक्षा में हैं?
+उत्तर: तटबंध सुदृढ़ीकरण हेतु स्वीकृत राशि का व्यय बाढ़ पूर्व तैयारी के
+अंतर्गत किया गया। शेष कार्य आगामी वित्तीय वर्ष की कार्ययोजना में
+सम्मिलित किए गए हैं तथा प्राथमिकता के आधार पर कराए जाएंगे।
+
+Question No. 1289
+Department: Social Welfare
+प्रश्न: क्या समाज कल्याण मंत्री यह बताने की कृपा करेंगे कि वृद्धावस्था
+पेंशन योजना के अंतर्गत कितने लाभुकों को विगत तिमाही में भुगतान किया
+गया तथा लंबित भुगतान के क्या कारण हैं?
+उत्तर: पेंशन भुगतान प्रत्यक्ष लाभ अंतरण के माध्यम से किया जा रहा है।
+लंबित प्रकरणों का मुख्य कारण आधार असंगति तथा बैंक खाता विवरण में
+त्रुटि रहा है, जिसका सुधार प्रखंड स्तर पर कराया जा रहा है।`;
+
+const DEFAULT_OCR = `विघान समा सचिवालय / LEGlSLATIVE ASSEMBLY SECRETARIAT
+तारांकित प्रश्नो की सूची — पचम सत्न
+
+Question No. 1Z47
+Department: Heaith and Famiiy Welfare
+प्रश्न: क्या स्वास्थ्य मंत्नी यह बताने की कपा करेंगे कि राज्य के ग्रामीण
+क्शेत्रों में सचालित प्राथमिक स्वास्थ्य केंद्रों की कुल सख्या कितनी है, तथा
+उनमें से कितने केद्र वर्तमान में नियमित चिकित्सको की कमी से प्रमावित हैं?
+उत्तर: राज्य में कुल एक हजार आठ सौ निन्यानवे प्राथमिक स्वास्थ्य केद्र
+सचालित हैं। इनमें से चार सौ वारह केंद्रों में नियमित चिकित्सक पदस्थापित
+नही हैं। रिक्त पदो पर नियुक्ति की प्रकिया सविदा के आधार पर प्रचलित है।
+
+Question No. l251
+Department: Rural Deveiopment
+प्रश्न: क्या ग्रामीण विकास मंत्नी यह बताने की कपा करेंगे कि विगत तीन वर्षों
+में स्वीकृत ग्रामीण सड़क परियोजनाओ में से कितनी परियोजनाएं निर्घारित
+समयसीमा के मीतर पूर्ण की गई हैं तथा विलव के प्रमुख कारण क्या रहे हैं?
+उत्तर: कुल स्वीकृत परियोजनाओं में से लगमग दो तिहाई परियोजनाएं निर्धारित
+अवधि में पूर्ण हुईं। शेष में विलव का प्रमुख कारण मूमि अधिग्रहण सबंधी
+विवाद तथा वर्षा ऋतु में कार्य स्थगन रहा है।
+
+Question No. 1258
+Department: Educatlon
+प्रश्न: क्या शिक्शा मंत्री यह बताने की कपा करेंगे कि राज्य के उच्च
+विद्यालयों में विज्ञान विषय के शिक्षको के कितने पद रिक्त हैं तथा इन पदो
+को मरने हेतु विमाग द्वारा क्या कार्रवाई की जा रही है?
+उत्तर: विज्ञान विषय के शिक्षकों के रिक्त पदों की गणना जिलावार की गई है।
+नियुक्ति हेतु अधियाचना आयोग को मेजी जा चुकी है तथा चयन प्रकिया
+वर्तमान वित्तीय वर्ष के मीतर पूर्ण किए जाने का लक्श्य निर्धारित है।
+
+Question No.
+Department: Water Resources
+प्रश्न: क्या जल संसाधन मंत्नी यह बताने की कपा करेंगे कि तटवंधों के
+सुदृढीकरण हेतु विगत वर्ष में कितनी राशि व्यय की गई तथा वर्तमान में कितने
+तटवंध मरम्मत की प्रतीक्शा में हैं?
+उत्तर: तटबंध सुदृढ़ीकरण हेतु स्वीकृत राशि का व्यय बाढ़ पूर्व तैयारी के
+अतर्गत किया गया। शेष कार्य आगामी वित्तीय वर्ष की कार्ययोजना में
+सम्मिलित किए गए हैं तथा प्राथमिकता के आधार पर कराए जाएंगे।
+
+Question No. 1Z89
+Department: Sociai Welfare
+प्रश्न: क्या समाज कल्याण मंत्नी यह बताने की कपा करेंगे कि वृद्घावस्था
+पेंशन योजना के अतर्गत कितने लामुकों को विगत तिमाही में मुगतान किया
+गया तथा लंवित मुगतान के क्या कारण हैं?
+उत्तर: पेंशन मुगतान प्रत्यक्श लाभ अंतरण के माध्यम से किया जा रहा है।
+लंबित प्रकरणों का मुख्य कारण आधार असगति तथा बैंक खाता विवरण में
+त्नुटि रहा है, जिसका सुधार प्रखंड स्तर पर कराया जा रहा है।`;
+
+function normalise(text) {
+  return text.normalize("NFC").replace(/\s+/g, " ").trim();
+}
+
+function editDistance(source, target) {
+  let a = Array.from(source);
+  let b = Array.from(target);
+  if (a.length < b.length) [a, b] = [b, a];
+  if (b.length === 0) return a.length;
+
+  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i];
+    for (let j = 1; j <= b.length; j++) {
+      current.push(
+        Math.min(
+          previous[j] + 1,
+          current[j - 1] + 1,
+          previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        )
+      );
+    }
+    previous = current;
+  }
+  return previous[previous.length - 1];
+}
+
+function findIdentifiers(text, regex) {
+  const out = [];
+  for (const m of text.matchAll(regex)) {
+    out.push(m.length > 1 && m[1] !== undefined ? m[1] : m[0]);
+  }
+  return out;
+}
+
+function analyse(truthRaw, ocrRaw, regex) {
+  const truth = normalise(truthRaw);
+  const ocr = normalise(ocrRaw);
+  const expected = findIdentifiers(truth, regex);
+  const recovered = expected.filter((item) => ocr.includes(item));
+  return {
+    truthChars: Array.from(truth).length,
+    edits: editDistance(truth, ocr),
+    expected,
+    recovered,
+  };
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+
+function render(report) {
+  const truthChars = report.truthChars;
+  const cer = truthChars ? report.edits / truthChars : 0;
+  const readsAs = (1 - cer) * 100;
+  const identifierChars = report.expected.reduce((sum, item) => sum + Array.from(item).length, 0);
+  const recall = report.expected.length ? report.recovered.length / report.expected.length : 0;
+  const bound = truthChars ? (identifierChars / truthChars) * 100 : 0;
+  const lost = report.expected.filter((item) => !report.recovered.includes(item));
+
+  const recallClass = recall === 1 ? "good" : "bad";
+  const readsAsClass = readsAs >= 90 ? "good" : "bad";
+
+  let lines = [
+    `<span class="c1">the metric everyone reports</span>`,
+    `  character error rate    ${cer.toFixed(4)}`,
+    `  reads as                <span class="${readsAsClass}">${readsAs.toFixed(1)}% accurate</span>`,
+    `  edits                   ${report.edits} over ${truthChars} characters`,
+    ``,
+    `<span class="c1">the metric the task needs</span>`,
+    `  identifiers expected    ${report.expected.length}`,
+    `  identifiers recovered   <span class="${recallClass}">${report.recovered.length}</span>`,
+    `  identifier recall       <span class="${recallClass}">${(recall * 100).toFixed(1)}%</span>`,
+  ];
+  if (lost.length) {
+    lines.push(`  lost                    ${escapeHtml(lost.join(", "))}`);
+  }
+  lines = lines.concat([
+    ``,
+    `<span class="c1">why the first number could not have caught it</span>`,
+    `  identifiers are ${identifierChars} of ${truthChars} characters, <span class="gold">${bound.toFixed(2)}%</span> of the page`,
+    `  so CER can move at most <span class="gold">${bound.toFixed(2)} points</span> between every identifier`,
+    `  being perfect and every identifier being destroyed`,
+    `  identifier recall moved <span class="bad">${Math.round((1 - recall) * 100)} points</span> on this same page`,
+  ]);
+  return lines.join("\n");
+}
+
+const truthEl = document.getElementById("truth");
+const ocrEl = document.getElementById("ocr");
+const patternEl = document.getElementById("pattern");
+const outputEl = document.getElementById("output");
+const warningEl = document.getElementById("warning");
+const resetBtn = document.getElementById("reset");
+
+let debounceHandle = null;
+
+function update() {
+  warningEl.hidden = true;
+  let regex;
+  try {
+    regex = new RegExp(patternEl.value, "g");
+  } catch (err) {
+    warningEl.hidden = false;
+    warningEl.textContent = `bad pattern: ${err.message}`;
+    return;
+  }
+
+  const report = analyse(truthEl.value, ocrEl.value, regex);
+  if (report.expected.length === 0) {
+    warningEl.hidden = false;
+    warningEl.textContent = `no identifiers matched ${patternEl.value} in the truth text`;
+    outputEl.innerHTML = "";
+    return;
+  }
+  outputEl.innerHTML = render(report);
+}
+
+function scheduleUpdate() {
+  clearTimeout(debounceHandle);
+  debounceHandle = setTimeout(update, 120);
+}
+
+function reset() {
+  truthEl.value = DEFAULT_TRUTH;
+  ocrEl.value = DEFAULT_OCR;
+  patternEl.value = DEFAULT_PATTERN;
+  update();
+}
+
+truthEl.addEventListener("input", scheduleUpdate);
+ocrEl.addEventListener("input", scheduleUpdate);
+patternEl.addEventListener("input", scheduleUpdate);
+resetBtn.addEventListener("click", reset);
+
+reset();
+</script>
+</body>
+</html>

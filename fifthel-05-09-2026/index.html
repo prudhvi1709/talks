@@ -622,7 +622,7 @@
           <aside class="notes">One honest complication, so this doesn't collapse into "just pick the right metric." In the OCR case, the entire ten-engine field - all four providers - spanned about two points of word accuracy. One correction to a font table improved Hindi misread three to four times, on all ten engines at once. If the question was whether a smaller or cheaper model was good enough, that comparison is the answer, and it was never about the model - it was a data-layer fix that dwarfed every model difference in the field. And the counterweight, so I'm not overclaiming rigor I didn't have: every Hindi score I'd published before that correction was measured against a corrupted answer key. The numbers were wrong. The rank order of all ten engines, and every decision taken on it, wasn't.</aside>
         </section>
 
-        <!-- 20. The bound (plan #20) - captured output from a real, runnable artifact; not live -->
+        <!-- 20. The bound (plan #20) - captured output on-slide; QR runs the same check live in the browser -->
         <section>
           <p class="eyebrow" style="margin-bottom: 14px;">A runnable artifact, not a diagram</p>
           <h2 class="big" style="font-size: clamp(26px, 3.6vw, 44px); margin-bottom: 18px;">The bound, on one page.</h2>
@@ -632,7 +632,7 @@
               <span class="term-dot" style="background:#f5a623;"></span>
               <span class="term-dot" style="background:#30d158;"></span>
             </div>
-            <div class="code"><span class="prompt">$</span> uv run --script metric_blindspot.py
+            <div class="code" style="font-size: clamp(11px, 1.1vw, 13px); line-height: 1.25;"><span class="prompt">$</span> uv run --script metric_blindspot.py
 
 <span class="c1">the metric everyone reports</span>
   character error rate    0.0340
@@ -651,21 +651,20 @@
   being perfect and every identifier being destroyed
   identifier recall moved <span class="bad">100 points</span> on this same page</div>
           </div>
-          <div class="prop-bar" style="height: 16px; margin-top: 24px;">
+          <div class="prop-bar" style="height: 14px; margin-top: 16px;">
             <div class="seg" style="left: 0; width: 0.86%; background: var(--gold);"></div>
             <div class="seg" style="left: 0.86%; width: 99.14%; background: #2a2d35;"></div>
           </div>
-          <p class="caption" style="font-size: clamp(16px, 2vw, 26px); margin-top: 14px;">Identifiers are <span class="accent">0.86%</span> of the page. Compute that ratio on your own corpus - that's the bound, before you run anything.</p>
-          <div style="display: flex; gap: 24px; justify-content: center; align-items: center; margin-top: 24px; flex-wrap: wrap;">
+          <p class="caption" style="font-size: clamp(15px, 1.8vw, 22px); margin-top: 10px;">Identifiers are <span class="accent">0.86%</span> of the page. Compute that ratio on your own corpus - that's the bound, before you run anything.</p>
+          <div style="display: flex; gap: 18px; justify-content: center; align-items: center; margin-top: 14px; flex-wrap: wrap;">
             <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&bgcolor=050608&color=f5f5f7&data=https%3A%2F%2Fraw.githubusercontent.com%2Fprudhvi1709%2Ftalks%2Fmain%2Ffifthel-05-09-2026%2Fartifact%2Fmetric_blindspot.py"
-              alt="QR code linking to the raw metric_blindspot.py script on GitHub"
-              style="border-radius: 10px; width: 130px; height: 130px;"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=050608&color=f5f5f7&data=https%3A%2F%2Fprudhvi1709.github.io%2Ftalks%2Ffifthel-05-09-2026%2Fartifact%2Finteractive.html"
+              alt="QR code linking to a browser page that runs the same identifier-recall check live"
+              style="border-radius: 10px; width: 96px; height: 96px;"
             >
-            <div class="code" style="font-size: clamp(11px, 1.3vw, 14px); text-align: left;"><span class="prompt">$</span> curl -O raw.githubusercontent.com/.../metric_blindspot.py
-<span class="prompt">$</span> uv run --script metric_blindspot.py</div>
+            <p class="caption" style="font-size: clamp(12px, 1.3vw, 15px); text-align: left; margin: 0; max-width: 420px;">Scan to try it live - edit the text, watch recall move while CER doesn't.</p>
           </div>
-          <aside class="notes">This is a small, runnable artifact - metric_blindspot.py, in the repo, no dependencies, no network, no model. Not running it live tonight, but it takes thirty seconds and no setup if you want to see it yourself afterward - that QR goes straight to the raw script on GitHub, one curl and one uv run and you have it. The gold sliver is the identifier characters: 0.86 percent of the page. Compute identifier_chars over total_chars on your own corpus, and you have this bound before you run anything.</aside>
+          <aside class="notes">This is a small, runnable artifact - metric_blindspot.py, in the repo, no dependencies, no network, no model. Not running it live on stage, but that QR takes you to a page that runs the identical check live in your own browser right now - edit the truth or OCR text and watch identifier recall collapse while CER barely moves. The gold sliver is the identifier characters: 0.86 percent of the page. Compute identifier_chars over total_chars on your own corpus, and you have this bound before you run anything.</aside>
         </section>
 
         <!-- 21. Takeaways (plan #21) - the one slide allowed bullets, lifted from abstract.md -->
