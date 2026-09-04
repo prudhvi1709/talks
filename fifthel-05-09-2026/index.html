@@ -226,7 +226,8 @@
             <span class="chip">3 &middot; vision verifier &middot; CCTV compliance</span>
           </div>
           <p class="sub" style="margin-top: 34px;">Nothing in common between the three systems - except this question, asked once per case.</p>
-          <aside class="notes">Three different systems, nothing in common between them except that question. An OCR engine, for a document pipeline. An embedding model, for retrieval. A vision verifier, for grading CCTV compliance. I'll go through them one at a time, in order, and show you the number that fooled me in each.</aside>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">One thing held constant: every model below, hosted or small, is used exactly as downloaded or called via API. No fine-tuning, no custom training, on either side.</p>
+          <aside class="notes">Three different systems, nothing in common between them except that question. An OCR engine, for a document pipeline. An embedding model, for retrieval. A vision verifier, for grading CCTV compliance. I'll go through them one at a time, in order, and show you the number that fooled me in each. One thing held constant throughout: every model here, hosted and small, is used exactly as downloaded or called via its API - nobody fine-tuned anything, on either side of any of these three comparisons.</aside>
         </section>
 
         <!-- 3. Case one setup: Tesseract (plan #3) -->
@@ -235,11 +236,10 @@
           <h2 class="big">Tesseract.</h2>
           <p class="sub" style="margin-bottom: 28px;">Free. Local. No API cost.</p>
           <div class="photo-card">
-            <img src="assets/tesseract-scan.jpg" alt="A real scanned government document page in Hindi, the kind of source material this benchmark runs on">
-            <div class="annot" style="top: 51%; left: 7%; width: 9%; height: 8%;"></div>
-            <div class="annot-label" style="top: 60.5%; left: 7%;">a question number</div>
+            <img src="assets/tesseract-scan.jpg" alt="A real scanned government document page in Hindi, showing starred question 1883, the kind of source material this benchmark runs on">
+            <div class="annot" style="top: 13%; left: 7%; width: 13.5%; height: 11%;"></div>
           </div>
-          <p class="photo-caption">One real page from the corpus - not the page behind any number on this slide. Highlighted: what a question number looks like in the source.</p>
+          <p class="photo-caption">One real page from the corpus - the exact page behind the *1883 example on the next slide.</p>
           <div class="metric-panel" style="margin-top: 28px;">
             <div class="metric-row" style="margin-bottom: 0;">
               <span class="metric-label">Word accuracy, Hindi</span>
@@ -258,13 +258,13 @@
         <section>
           <p class="eyebrow">The question I actually asked</p>
           <h2 class="big">Could it still read<br>the question number?</h2>
-          <div class="code" style="text-align: center; margin-top: 44px;">expected&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;recovered
-*896.&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="bad circled">+896.</span>
-*897.&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="bad circled">#897.</span></div>
+          <div class="code" style="text-align: center; margin-top: 44px;">question&nbsp;&nbsp;&nbsp;<span class="c1">*1883.</span>
+small model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="bad circled">+883.</span>
+hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span class="good">*1883.</span></div>
           <p class="caption">The string that links a question to its answer.</p>
-          <p class="sub" style="font-size: clamp(15px, 1.7vw, 19px); color: var(--dim); margin-top: 14px;">A "junk token" - one invented character where the source has none. Rate on a genuine scan: <span class="up">2.2% -&gt; 5.2%</span>, and the junk lands exactly on the question numbers, circled above.</p>
+          <p class="sub" style="font-size: clamp(15px, 1.7vw, 19px); color: var(--dim); margin-top: 14px;">A junk token and a dropped leading digit - the source says <span class="c1">*1883</span>, the small model returns <span class="up">+883</span>. Rate on a genuine scan: <span class="up">2.2% -&gt; 5.2%</span> junk-token rate, and it lands exactly on the question numbers, circled above.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Benchmark: word accuracy. Metric that mattered: can the question number survive.</p>
-          <aside class="notes">Word accuracy wasn't the number the product needed. The product needed the question number - the string that links a question to its answer. A junk token is one invented character where the source has none. On a genuine scanned page, the junk-token rate doubles, 2.2 percent to 5.2 percent, and the junk lands exactly on the question numbers. Star-896-period comes back as plus-896-period. Star-897 becomes hash-897. Same benchmark. Same model - just a different axis.</aside>
+          <aside class="notes">Word accuracy wasn't the number the product needed. The product needed the question number - the string that links a question to its answer. On this page, the question is starred one-eight-eight-three. The small model turned the star into a plus and dropped the leading digit, returning plus eight-eight-three - a different question entirely if nothing catches it. Every hosted model read it correctly, one-eight-eight-three. On a genuine scanned page, this kind of corruption rate doubles, 2.2 percent to 5.2 percent, and it lands exactly on the question numbers. Same benchmark. Same model - just a different axis.</aside>
         </section>
 
         <!-- 5. The number (plan #5): question-number recovery, three bars -->
@@ -413,8 +413,8 @@
               <span class="metric-value dim">0.403</span>
             </div>
           </div>
-          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 14px;">Benchmark: beat BM25 on recall and MRR. Metric that mattered: beat it without winning on hard negatives - and it did, at 0.020 against a 0.074 ceiling.</p>
-          <aside class="notes">Chosen. BM25 is the classic keyword-search ranker, no embeddings, no meaning - the baseline anyone would compare against. Recall at 10 just means: of the top 10 results it returns, how often is the right passage in there at all. bge-m3 separated them correctly on the plain benchmark - recall at 10: 64.4 versus 58.4, MRR: 0.461 versus 0.403. But that's not why it was chosen. It was chosen because it beat that baseline without pattern-matching its way there - hard-negative MRR stayed at 0.020, well under the 0.074 ceiling that would have flagged a model winning on surface tokens instead of meaning.</aside>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 14px;">Benchmark: beat BM25 on recall and MRR. Metric that mattered: beat it without winning on hard negatives - and it did, at 0.020 against a 0.074 ceiling. All of this straight off the shelf - no fine-tuning on this corpus.</p>
+          <aside class="notes">Chosen. BM25 is the classic keyword-search ranker, no embeddings, no meaning - the baseline anyone would compare against. Recall at 10 just means: of the top 10 results it returns, how often is the right passage in there at all. bge-m3 separated them correctly on the plain benchmark - recall at 10: 64.4 versus 58.4, MRR: 0.461 versus 0.403. But that's not why it was chosen. It was chosen because it beat that baseline without pattern-matching its way there - hard-negative MRR stayed at 0.020, well under the 0.074 ceiling that would have flagged a model winning on surface tokens instead of meaning. And worth saying plainly: this is bge-m3 exactly as downloaded. No fine-tuning on our corpus. An off-the-shelf small model beat a hosted proprietary one, out of the box.</aside>
         </section>
 
         <!-- 11. Case three setup: SAM 3.1 (plan #11) -->
