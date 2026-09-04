@@ -14,10 +14,15 @@
          screen, no bullets except the takeaways slide. Charts are real SVG
          built from figures.md numbers, not screenshots.
 
-         Full build, all 22 plan slides, nothing cut: all three cases and
-         verdicts, the pre-registered-bar mechanism (#9), the third-layer
-         adjudicator sub-story (#15-17), the pattern slide, the honest
-         complication (#19: the model was rarely the lever), takeaways, close.
+         28 slides. All three cases and verdicts, the pre-registered-bar
+         mechanism (#9), the third-layer adjudicator sub-story (now one
+         merged slide: the canonical win and its punchline together), the
+         pattern slide, the honest complication (the model was rarely the
+         lever), takeaways, close. Two slides folded during a 2026-09-04
+         continuity pass: the two case-three "public number" setup slides
+         (frontier miss rate + SAM's own benchmark) merged into one, and the
+         canonical-win evidence merged with its punchline slide - saved two
+         slides without cutting the underlying findings.
          No live demo (plan #20 is now a static slide, "The bound, on one
          page") - the room isn't getting a live terminal run, so the artifact
          is presented as captured output instead. Every metric-bearing slide
@@ -207,7 +212,7 @@
         <section>
           <p class="eyebrow">The Fifth Elephant</p>
           <h2 class="huge">Good Enough<br><span class="accent">for What?</span></h2>
-          <aside class="notes">Good evening. I'm Prudhvi. Tonight's talk is called Good Enough for What. [let the title sit a moment before advancing]</aside>
+          <aside class="notes">Good evening. I'm Prudhvi. Tonight's talk is called Good Enough for What. [let the title sit a moment before advancing] I'm a data scientist at Straive, mostly on the LLM side - explore and exploit: finding what these models can actually do, and then figuring out when that's enough to bet production on.</aside>
         </section>
 
         <!-- 2. Cold open (plan #2) -->
@@ -230,9 +235,36 @@
           <aside class="notes">Three different systems, nothing in common between them except that question. An OCR engine, for a document pipeline. An embedding model, for retrieval. A vision verifier, for grading CCTV compliance. I'll go through them one at a time, in order, and show you the number that fooled me in each. One thing held constant throughout: every model here, hosted and small, is used exactly as downloaded or called via its API - nobody fine-tuned anything, on either side of any of these three comparisons.</aside>
         </section>
 
-        <!-- 3. Case one setup: Tesseract (plan #3) -->
+        <!-- 3. The public number that made it worth trying (added: benchmark-vs-metric restructure, case one) -->
         <section>
           <p class="eyebrow">Case one &middot; a document pipeline</p>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px);">Hosted OCR usually wins,<br>publicly, by ~9 points.</h2>
+          <div class="metric-panel" style="margin-top: 28px;">
+            <div class="metric-row">
+              <span class="metric-label">Tesseract, general OCR benchmark</span>
+              <div class="metric-track"><div class="metric-fill up" style="width: 87.2%;"></div></div>
+              <span class="metric-value up">87.2</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Google Cloud Vision, same benchmark</span>
+              <div class="metric-track"><div class="metric-fill" style="width: 95.9%; background: var(--dim);"></div></div>
+              <span class="metric-value dim">95.9</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Sarvam, Hindi-specific OCR benchmark</span>
+              <div class="metric-track"><div class="metric-fill accent" style="width: 95.91%;"></div></div>
+              <span class="metric-value accent">95.91</span>
+            </div>
+          </div>
+          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px);">Two different roundups: a generic one, and Sarvam's own Indic bench, where it beats Gemini 3 Pro (95.12) and GPT-5.2 (84.86).</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 10px;">Real, official, Indic-specific OCR done well. It just wasn't part of this ten-engine comparison.</p>
+          <div style="display: flex; justify-content: center; margin-top: 16px;"><span class="source"><span class="dot"></span>aimultiple.com OCR Accuracy Benchmark; sarvam.ai/blogs/sarvam-vision</span></div>
+          <aside class="notes">First case: a document pipeline. Scanned government pages get OCR'd into a corpus, and every answer downstream has to trace back to the exact question it came from. Before I tested anything, there was a public number. Generic OCR roundups put Tesseract, a free, local OCR engine, around 87 percent against Google Cloud Vision at about 96 - hosted usually wins by close to nine points. That's the gap I expected going in. Worth putting right up here, not as a footnote: Sarvam, an Indic-specific OCR model, publishes its own Hindi benchmark at 95.91 percent - ahead of Gemini 3 Pro and GPT-5.2 on their own bench. Genuinely strong, Indic-specific OCR exists, real and official. It just wasn't part of this particular ten-engine test.</aside>
+        </section>
+
+        <!-- 3b. Tesseract on my own corpus (added: benchmark-vs-metric restructure, case one) -->
+        <section>
+          <p class="eyebrow">So I tested it on my own corpus</p>
           <h2 class="big">Tesseract.</h2>
           <p class="sub" style="margin-bottom: 28px;">Free. Local. No API cost.</p>
           <div class="photo-card">
@@ -251,7 +283,8 @@
               <span class="metric-value up">90.03</span>
             </div>
           </div>
-          <aside class="notes">First case. This was a document pipeline - scanned government pages get OCR'd into a corpus, and every answer downstream has to trace back to the exact question it came from. So: Tesseract, a free, local OCR engine. Someone challenged me on a benchmark row - Tesseract was scoring 90.03 word accuracy on Hindi, against hosted frontier OCR models at 92 to 95. I re-ran it. It reproduced. The output read beside the ground truth is genuinely good Devanagari prose. I nearly shipped it.</aside>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">The gap nearly vanished - which is exactly what made me trust it.</p>
+          <aside class="notes">So: Tesseract. Someone challenged me on a benchmark row - it was scoring 90.03 word accuracy on Hindi, against hosted frontier OCR models at 92 to 95. I re-ran it. It reproduced. The output read beside the ground truth is genuinely good Devanagari prose. Against the roughly nine-point gap I expected walking in, this was nearly a tie - and that near-miss is exactly what made me trust it enough to nearly ship it.</aside>
         </section>
 
         <!-- 4. The check that mattered (plan #4) -->
@@ -296,15 +329,15 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
               <div class="cnote">vs. hosted 100% - not close at all</div>
             </div>
           </div>
-          <aside class="notes">Rejected. Free and local wasn't the deciding factor. Word accuracy, the number everyone benchmarks on, said close call: 90.03 against hosted models at 92 to 95. Question-number recovery, the number the product actually depended on, said not close at all: 68 percent against 100. Same model, same benchmark run, two different axes - and only one of them was the metric. One footnote for anyone who asks: I didn't test any Indic-specific OCR model here, like Sarvam's - worth checking, but it wasn't part of this ten-engine comparison. And if you want to reproduce this yourself with zero client data - there's a script in the repo that generates a synthetic Hindi page, runs the real Tesseract binary on it, and gets the same gap: word accuracy fine, question numbers gone.</aside>
+          <aside class="notes">Rejected. Free and local wasn't the deciding factor. Word accuracy, the number everyone benchmarks on, said close call: 90.03 against hosted models at 92 to 95. Question-number recovery, the number the product actually depended on, said not close at all: 68 percent against 100. Same model, same benchmark run, two different axes - and only one of them was the metric. One footnote for anyone who asks: Sarvam, the Indic-specific OCR I mentioned earlier, genuinely strong on Hindi - still wasn't part of this ten-engine comparison. And if you want to reproduce this yourself with zero client data - there's a script in the repo that generates a synthetic Hindi page, runs the real Tesseract binary on it, and gets the same gap: word accuracy fine, question numbers gone.</aside>
         </section>
 
         <!-- 7. Case two setup: bge-m3 (plan #7) -->
         <section>
           <p class="eyebrow">Case two &middot; retrieval feeding generation</p>
           <h2 class="big">bge-m3.</h2>
-          <p class="sub">Open. <span class="accent">~570M</span> parameters. One modest GPU.<br>Against hosted <span class="dim">text-embedding-3-small</span>.</p>
-          <aside class="notes">Second case. This is a retrieval system over that same bilingual Hindi-English archive - someone asks a question, we embed it, pull back the passage that answers it, and only that passage goes to generation. So: embeddings. bge-m3 is an open model, about 570 million parameters, runs on one modest GPU. I was comparing it against a hosted OpenAI embedding model, text-embedding-3-small.</aside>
+          <p class="sub">Open. <span class="accent">~570M</span> parameters. One modest GPU.<br>Against hosted <span class="dim">text-embedding-3-large</span>.</p>
+          <aside class="notes">Second case, different kind of system. This is search - someone asks a question, we turn it into a vector, pull back whatever passage looks closest, and only that passage goes on to generate the answer. So this is about embeddings, not OCR anymore. I was testing an open model called bge-m3, small enough to run on one regular GPU, against OpenAI's own hosted embedding model.</aside>
         </section>
 
         <!-- 7b. The public benchmark that made it worth trying (added: benchmark-vs-metric restructure) -->
@@ -324,9 +357,9 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             </div>
           </div>
           <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px);">nDCG@10, MIRACL multilingual retrieval - bge-m3's own published benchmark, not this corpus.</p>
-          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">On Hindi specifically: 59.3. And note the model it beat here is OpenAI's <span class="cyan">larger</span> embedding model - not the smaller one we actually run.</p>
-          <div style="display: flex; justify-content: center; margin-top: 16px;"><span class="source"><span class="dot"></span>BGE-M3 paper, arXiv 2402.03216, Table 2</span></div>
-          <aside class="notes">Before any of this was about our corpus, there was a public number. bge-m3's own paper benchmarks it on MIRACL, a standard multilingual retrieval benchmark, against OpenAI's larger embedding model - text-embedding-3-large, not the smaller one we actually run in production. It wins by about fifteen points on average nDCG@10, seventy versus fifty-five, and on Hindi specifically it scores 59.3. That public result is what made it worth testing at all - against the model we actually use, the smaller and cheaper text-embedding-3-small. But a public multilingual leaderboard doesn't tell you if it works on your corpus, with your queries, against your specific failure mode. That's the pivot into what I actually found.</aside>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">On Hindi specifically: 59.3. That's OpenAI's <span class="cyan">text-embedding-3-large</span> - the same model we're testing against throughout this case, on both a public benchmark and our own data.</p>
+          <div style="display: flex; justify-content: center; margin-top: 16px;"><span class="source"><span class="dot"></span>BGE-M3 paper, arXiv 2402.03216, Table 2; OpenAI embedding-models announcement</span></div>
+          <aside class="notes">Before I even touched our own data, there was a public number for bge-m3 that made me want to try it - it beat OpenAI's model on a well-known multilingual benchmark. So this isn't strong model versus weak model, it's a real, respected embedding model. It's just: this looked good on paper, let's see if it holds up on our actual data.</aside>
         </section>
 
         <!-- 8. The diagnostic (plan #8): staged reveal, let the room spot the tell -->
@@ -335,7 +368,8 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             <img src="assets/tesseract-scan.jpg" alt="A real scanned page from the same bilingual Hindi-English archive this retrieval system runs on">
           </div>
           <p class="photo-caption" style="margin: 0 0 20px;">Same archive as case one - texture, not the actual retrieved passage</p>
-          <p class="eyebrow">The tell &middot; cosine similarity, hosted embedding model</p>
+          <p class="eyebrow">The tell &middot; the hosted model, <span class="dim">text-embedding-3-large</span></p>
+          <h2 class="big" style="font-size: clamp(22px, 3vw, 34px); margin-bottom: 14px;">OpenAI's hosted model ranked<br>the wrong passage higher.</h2>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin: 4px 0 16px;">Cosine similarity: how close two pieces of text sit in the model's meaning-space, from 0 to 1. Higher should mean "closer in meaning" - the right passage should score higher than a wrong one.</p>
           <div class="metric-panel">
             <div class="metric-row fragment">
@@ -355,12 +389,12 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             </div>
           </div>
           <p class="caption fragment">It understands English fine. In Devanagari, it fell back to surface token overlap.</p>
-          <aside class="notes">This is the same archive as case one - texture again, not the actual passage pair. Here's the tell - cosine similarity scores from the hosted embedding model. Cosine similarity is just how close two pieces of text sit in the model's meaning-space, zero to one - higher is supposed to mean closer in meaning, so the right passage should outscore a wrong one. [reveal first two bars] It scored a distractor passage 0.328, and the actual correct Hindi passage 0.262 - it ranked the wrong answer higher. [reveal third bar] Same content, in English, scored 0.082. It understands English fine. In Devanagari it was falling back to surface token overlap - matching characters, not meaning.</aside>
+          <aside class="notes">This next test is OpenAI's model, the same one from the last slide, not bge-m3. [reveal first two bars] I gave it a question in Hindi, and it picked the wrong passage over the right one. [reveal third bar] Then I gave it the exact same thing in English, and it got it completely right. So it's not that the model's bad - it just wasn't really understanding Hindi. It was matching letters on the page, not meaning.</aside>
         </section>
 
         <!-- 9. Pre-registered bar (plan #9) - the mechanism check, written down before running the test -->
         <section>
-          <p class="eyebrow">Written down before I ran it</p>
+          <p class="eyebrow">bge-m3 &middot; written down before I ran it</p>
           <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 10px;">Beat the baseline.<br>Without cheating to do it.</h2>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin: 6px 0 0;">MRR: how high up the correct passage ranks, on average. A "hard negative": a wrong passage built to look right - the trap a model can pass by matching words instead of meaning.</p>
           <div class="metric-panel" style="margin-top: 24px;">
@@ -385,7 +419,7 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
           </div>
           <p class="caption">Without the second bar, a model that wins by matching surface tokens still passes.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Benchmark: beat the baseline on MRR. Metric that mattered: beat it without winning on hard negatives.</p>
-          <aside class="notes">MRR is how high up the correct passage ranks, on average - and a hard negative is a wrong passage built to look right, the trap a model can pass by matching words instead of meaning. [cut first if short, down to the next full stop] It cleared a bar I'd written down before running it: beat 0.403 MRR while holding hard-negative MRR near 0.074 - a model that's just pattern-matching surface tokens would win on the first number and blow through the ceiling on the second. bge-m3 beat the win line at 0.461, and stayed well under the ceiling at 0.020. The benchmark here was just "beat the baseline on MRR." The metric that actually mattered was beating it without winning that way.</aside>
+          <aside class="notes">Back to bge-m3 now, not the hosted model. Before I ran this test, I wrote down a rule for myself: it's not enough to just beat the basic keyword search, it has to beat it without cheating - without just matching surface words like the other model did. bge-m3 cleared both. It beat the baseline, and it did it the honest way.</aside>
         </section>
         <!-- 10. Verdict: chosen (plan #10) -->
         <section>
@@ -414,18 +448,64 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             </div>
           </div>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 14px;">Benchmark: beat BM25 on recall and MRR. Metric that mattered: beat it without winning on hard negatives - and it did, at 0.020 against a 0.074 ceiling. All of this straight off the shelf - no fine-tuning on this corpus.</p>
-          <aside class="notes">Chosen. BM25 is the classic keyword-search ranker, no embeddings, no meaning - the baseline anyone would compare against. Recall at 10 just means: of the top 10 results it returns, how often is the right passage in there at all. bge-m3 separated them correctly on the plain benchmark - recall at 10: 64.4 versus 58.4, MRR: 0.461 versus 0.403. But that's not why it was chosen. It was chosen because it beat that baseline without pattern-matching its way there - hard-negative MRR stayed at 0.020, well under the 0.074 ceiling that would have flagged a model winning on surface tokens instead of meaning. And worth saying plainly: this is bge-m3 exactly as downloaded. No fine-tuning on our corpus. An off-the-shelf small model beat a hosted proprietary one, out of the box.</aside>
+          <aside class="notes">Chosen. bge-m3 beat the plain keyword-search baseline, and it did it properly - by actually understanding the passage, not by matching words. And worth saying out loud: this is bge-m3 exactly as downloaded, no fine-tuning, nothing extra. A small open model beat a hosted, paid one, straight out of the box.</aside>
         </section>
 
-        <!-- 11. Case three setup: SAM 3.1 (plan #11) -->
+        <!-- 11. The use case: grading CCTV compliance (added: use-case-first restructure, case three) -->
         <section>
-          <p class="eyebrow">Case three &middot; grading CCTV compliance</p>
-          <h2 class="big">SAM 3.1.</h2>
-          <p class="sub">Frontier model <span class="cyan">proposes</span>.<br>Self-hosted SAM 3.1 <span class="accent">verifies</span> every cited frame.</p>
+          <p class="eyebrow">Case three &middot; a different kind of system</p>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px);">Grading CCTV compliance,<br>against a client's rulebook.</h2>
           <div class="photo-card" style="width: min(320px, 70vw); margin: 18px auto 0;">
             <img src="assets/warehouse-safety.jpg" alt="An overhead warehouse camera view from a public dataset, illustrating the kind of top-down CCTV coverage this case is about">
           </div>
-          <p class="photo-caption">Not the client's footage or facility - a public overhead-warehouse dataset, same kind of coverage. "Warehouse Safety" dataset (CC BY 4.0), 's Workspace / Roboflow Universe.</p>
+          <p class="photo-caption">Not the client's footage or facility - a public overhead-warehouse dataset, same kind of coverage. "Warehouse Safety" dataset (CC BY 4.0), Roboflow Universe.</p>
+          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px); margin-top: 20px;">Long, unedited recordings. A model watches the footage and grades compliance - and that grade drives a real decision.</p>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Hard constraint going in: this footage can't leave the client's infrastructure to any hosted model.</p>
+          <aside class="notes">Third case, a completely different kind of system, and I want to explain what it actually is before any numbers, because this one isn't self-explanatory the way OCR or search are. This started as a manual process - someone sitting and watching long, unedited CCTV recordings by hand, to check whether the footage matches the client's own compliance rulebook. We proposed automating that with AI. That's not the client's footage, by the way, I can't show that - it's a public dataset, same kind of overhead camera coverage, different facility. So the idea is: a model watches the footage and grades compliance, and that grade drives a real decision, so a wrong one has real consequences. And there was a hard constraint going in from day one - the client didn't want their raw CCTV footage leaving their infrastructure and going to any hosted model. That shapes everything about what I could actually build here.</aside>
+        </section>
+
+        <!-- 11b. Two public numbers behind the verify-don't-trust pattern (merged: former 11b+11c) -->
+        <section>
+          <p class="eyebrow">So before building anything, two public numbers</p>
+          <h2 class="big" style="font-size: clamp(24px, 3.4vw, 40px);">Frontier misses this sometimes.<br>SAM is a real detector.</h2>
+          <div class="metric-panel" style="margin-top: 22px;">
+            <div class="metric-row">
+              <span class="metric-label">Gemini-2.5-Pro, loose scoring (IoU 0.3)</span>
+              <div class="metric-track"><div class="metric-fill" style="width: 74.1%; background: var(--dim);"></div></div>
+              <span class="metric-value dim">74.1%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Gemini-2.5-Pro, strict scoring (IoU 0.5)</span>
+              <div class="metric-track"><div class="metric-fill up" style="width: 61.1%;"></div></div>
+              <span class="metric-value up">61.1%</span>
+            </div>
+          </div>
+          <p class="sub" style="font-size: clamp(12px, 1.4vw, 15px); color: var(--dim); font-style: italic; margin-top: 6px;">TimeLens-Bench - can a model say <span class="accent">when</span> something happens in a video. Not what this pipeline was measured on - the closest public analog.</p>
+          <div class="metric-panel" style="margin-top: 20px;">
+            <div class="metric-row">
+              <span class="metric-label">SAM 3 (cgF1, SA-Co/Gold)</span>
+              <div class="metric-track"><div class="metric-fill up" style="width: 54.1%;"></div></div>
+              <span class="metric-value up">54.1</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">best prior baseline (OWLv2)</span>
+              <div class="metric-track"><div class="metric-fill" style="width: 24.6%; background: var(--dim);"></div></div>
+              <span class="metric-value dim">24.6</span>
+            </div>
+          </div>
+          <p class="sub" style="font-size: clamp(12px, 1.4vw, 15px); color: var(--dim); font-style: italic; margin-top: 6px;">Promptable concept segmentation, Meta's own benchmark. Neither number above ever asked whether a conveyor is extended into a trailer - no one publishes that benchmark, it's the client's own rule.</p>
+          <div style="display: flex; justify-content: center; gap: 16px; margin-top: 14px; flex-wrap: wrap;">
+            <span class="source"><span class="dot"></span>TimeLens-Bench, arXiv 2512.14698</span>
+            <span class="source"><span class="dot"></span>Meta AI, arXiv 2511.16719</span>
+          </div>
+          <aside class="notes">Before I built anything, there were two public numbers worth knowing, and together they're why the pattern going in was frontier proposes, small model verifies - not either one alone. First: even a frontier model like Gemini-2.5-Pro misses on a meaningful share of cases on TimeLens-Bench, a benchmark built for exactly this skill - can a model say when something happened, not just what happened. That's not the benchmark this pipeline was measured on, it's the closest public analog I could verify, and it matched what I'd already seen running it myself - drifting on timestamps, not just missing the window entirely. Second: SAM itself has a real public number too. On Meta's own benchmark, SAM 3 scores 54.1, more than double the best prior system at 24.6 - a real, respectable result. But neither of these numbers ever asked whether a conveyor is extended into a trailer. Nobody publishes that benchmark - it's the client's own rule. So what I'm about to walk through isn't a surprise that a verifier was needed, and it isn't a case where SAM was secretly bad at a known skill. It's a surprise about which layer actually failed, on a question no public benchmark was ever going to ask.</aside>
+        </section>
+
+        <!-- 11d. So here's the pattern I built: SAM 3.1 (formerly plan #11) -->
+        <section>
+          <p class="eyebrow">So here's the pattern I built</p>
+          <h2 class="big">SAM 3.1.</h2>
+          <p class="sub">Frontier model <span class="cyan">proposes</span>.<br>Self-hosted SAM 3.1 <span class="accent">verifies</span> every cited frame.</p>
           <div class="arch">
             <div class="arch-node"><div class="an-label">Frontier model</div><div class="an-sub">reads footage,<br>cites frames</div></div>
             <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg><span class="al">cites</span></div>
@@ -433,36 +513,14 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg><span class="al">verifies</span></div>
             <div class="arch-node"><div class="an-label">Interface</div><div class="an-sub">shows only what's<br>defended</div></div>
           </div>
-          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Self-hosted wasn't a preference - the client's rule was that CCTV footage doesn't leave their infrastructure to any hosted model.</p>
-          <aside class="notes">Third case, a different system entirely. This started as a manual process - someone watching long, unedited CCTV recordings by hand to check compliance - and we proposed automating it with AI. That's not the client's footage, by the way - I can't show that - it's a public dataset, same kind of overhead coverage, different facility. A frontier model reads the footage and grades compliance against the client's own rulebook - and that grade drives a real decision, so a wrong one has consequences. There was also a hard constraint going in: the client didn't want raw CCTV footage leaving their infrastructure to any hosted model, so whatever checked the frontier model's citations had to run locally too. That's why SAM 3.1, self-hosted on one workstation GPU, cross-checking every frame it cited before anything reached a person. Frontier proposes, small model verifies. It's a good pattern. I still believe in it.</aside>
-        </section>
-
-        <!-- 11b. The public number behind the verify-don't-trust pattern (added: benchmark-vs-metric restructure) -->
-        <section>
-          <p class="eyebrow">The public number behind "don't trust it alone"</p>
-          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px);">Frontier models miss this,<br>publicly, 1 in 4 to 2 in 5 times.</h2>
-          <div class="metric-panel" style="margin-top: 28px;">
-            <div class="metric-row">
-              <span class="metric-label">loose scoring (IoU 0.3)</span>
-              <div class="metric-track"><div class="metric-fill" style="width: 74.1%; background: var(--dim);"></div></div>
-              <span class="metric-value dim">74.1%</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-label">strict scoring (IoU 0.5)</span>
-              <div class="metric-track"><div class="metric-fill up" style="width: 61.1%;"></div></div>
-              <span class="metric-value up">61.1%</span>
-            </div>
-          </div>
-          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px);">Gemini-2.5-Pro, on TimeLens-Bench - can a model say <span class="accent">when</span> something happens in a video.</p>
-          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Not what this pipeline was measured on - the closest public analog to the exact skill it needed.</p>
-          <div style="display: flex; justify-content: center; margin-top: 16px;"><span class="source"><span class="dot"></span>TimeLens-Bench, arXiv 2512.14698</span></div>
-          <aside class="notes">Before any of this was about the client's footage, there's a public number worth knowing. TimeLens-Bench is a benchmark built for exactly this skill - can a model say when something happened in a video, not just what happened. Even a frontier model like Gemini-2.5-Pro gets it wrong on a meaningful share of cases there - about one in four misses under loose scoring, closer to two in five under strict scoring. This isn't the benchmark our pipeline was measured on - I'm using it as the closest public analog I could verify. But it's exactly why the pattern going in was frontier proposes, small model verifies, not frontier alone. So what I'm about to walk through isn't a surprise that a verifier was needed - it's a surprise about which layer actually failed.</aside>
+          <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Self-hosted, because the footage can't leave the client's infrastructure. And to be precise: SAM 3.1 is a speed and video-tracking patch on SAM 3, not a re-benchmark of that 54.1 figure.</p>
+          <aside class="notes">So, given those two public numbers, here's the pattern I actually built - and to be precise about which model earned that SAM number, SAM 3.1 running here is a follow-up patch on speed and video tracking, not a re-statement of that same figure. The frontier model reads the footage and grades compliance against the client's rulebook, citing the frames it's basing that grade on. And SAM 3.1, self-hosted on one workstation GPU, cross-checks every frame it cited before anything reaches a person - not as a detector deciding what's in the scene, as a validator checking the frontier model's claim. Same rule as the other two cases: used exactly as downloaded, no fine-tuning - I wasn't training a detector for this. Frontier proposes, small model verifies. It's a good pattern. I still believe in it.</aside>
         </section>
 
         <!-- 12. Measured three ways, lost all three (plan #12) -->
         <section>
           <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 4px;">Measured three ways.<br>Lost all three.</h2>
-          <p class="caption" style="margin-top: 4px; margin-bottom: 2px; font-size: clamp(14px, 1.6vw, 19px); color: var(--dim);">disagreed with the frontier model, 38 of 65 scored checks - most were its own prompt bugs, not real disagreements</p>
+          <p class="caption" style="margin-top: 4px; margin-bottom: 2px; font-size: clamp(14px, 1.6vw, 19px); color: var(--dim);">disagreed with the frontier model, 38 of 65 scored checks - it could only ask for "conveyor," never "extended into the trailer"</p>
           <div class="prop-bar">
             <div class="seg" style="left: 0; width: 58.5%; background: var(--up);"></div>
             <div class="seg" style="left: 58.5%; width: 41.5%; background: #2a2d35;"></div>
@@ -479,29 +537,8 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             </div>
           </div>
           <p class="caption" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 8px;">Worst of three sessions on conveyor timing - wrong on all three, off by up to 25 minutes into the recording.</p>
-          <div class="metric-panel" style="margin-top: 20px;">
-            <div class="metric-row" style="margin-bottom: 4px;">
-              <span class="metric-label" style="font-size: 13px; color: var(--dim);">threshold set at</span>
-              <div class="metric-track" style="background: transparent; height: 0;">
-                <span class="dot-marker" style="left: 50%; background: var(--dim);"></span>
-                <span class="dot-marker" style="left: 66.7%; background: var(--dim);"></span>
-                <span class="dot-marker" style="left: 83.3%; background: var(--dim);"></span>
-              </div>
-              <span class="metric-value" style="visibility: hidden;">.</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-label" style="font-size: 13px; color: var(--dim);">score that fired</span>
-              <div class="metric-track" style="background: #161820; height: 6px;">
-                <span class="dot-marker" style="left: 52.7%; background: var(--up);"></span>
-                <span class="dot-marker" style="left: 52%; background: var(--up);"></span>
-                <span class="dot-marker" style="left: 71.3%; background: var(--up);"></span>
-              </div>
-              <span class="metric-value" style="visibility: hidden;">.</span>
-            </div>
-          </div>
-          <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px); margin-top: 22px;">Thresholds hand-set at 0.15 / 0.2 / 0.25. Firing scores sat barely above whichever floor admitted them.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Agreeing with the frontier model isn't the same question as being right.</p>
-          <aside class="notes">I measured it three ways. It disagreed with the frontier model on 38 of 65 scored checks - and most of those disagreements turned out to be its own prompt bugs, not real disagreements. That's the trap: agreement-with-the-frontier-model looks like a benchmark, but it isn't the metric that matters. Against human ground truth on conveyor timing, it was wrong on all three sessions - the worst miss by 25 minutes. And its confidence threshold was hand-set at three different values across three files, with the detections that fired sitting barely above whichever floor let them in.</aside>
+          <aside class="notes">I measured it three ways, and first it disagreed with the frontier model on 38 of 65 scored checks. But looking closer, most of that wasn't a real disagreement - it was a mismatch. SAM takes object names, not relations. I could tell it to look for a conveyor. I couldn't tell it to look for a conveyor extended into the trailer. So it was answering a narrower question than the rule actually asked, and agreeing with the frontier model never surfaced that. Against human ground truth on conveyor timing, it was wrong on all three sessions - the worst miss by 25 minutes.</aside>
         </section>
 
         <!-- 13. Threshold sweep (plan #13) -->
@@ -526,7 +563,7 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             </div>
           </div>
           <p class="caption" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 10px;">No score threshold fixes a prompt that's pointed at the wrong region of the frame.</p>
-          <aside class="notes">Costs nothing to check - the scans kept every detection and score, so I re-ran the sweep offline. At 0.25, session A lands within 30 seconds of ground truth. Session B at 0.25 is 25 minutes early; raise the threshold to 0.35, it swings to 13 minutes early; raise it to 0.40, 70 minutes late - nothing usable in between. Session C never scores above 0.226 in the entire recording - above that, it detects nothing, ever. Peak scores range from 0.226 to 0.586 for the exact same prompt, same object class. The scores aren't comparable across sessions, so a global threshold isn't a coherent idea here. And here's the actual defect, not just the symptom: the prompt said "conveyor" - it only had to see the belt itself. The compliance rule needed the conveyor's full extent, including where it runs into the trailer, because that's where the violation happens. Same warehouse-style overhead camera as the photo I showed earlier - the prompt was just looking at less of the frame than the rule cared about.</aside>
+          <aside class="notes">So the obvious question: was this just a bad setting, not a bad model? Easy to check, I had all the old recordings, so I could just replay them at every sensitivity level and see. What you're looking at here is exactly that: three separate recordings, and how far off from the real answer each one landed as I turned that sensitivity up and down. And no - I tried every setting, and nothing worked for all three at once. Turning it up helped one and broke another. So it wasn't a tuning problem. The real issue was simpler than that: I'd asked it to spot the conveyor. But the rule cared about something more specific - whether the conveyor reached all the way into the trailer, right there in those two boxes. It was checking for less than what the rule actually needed.</aside>
         </section>
 
         <!-- 14. Verdict: demoted (plan #14) -->
@@ -545,17 +582,17 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
           <p class="caption" style="font-size: clamp(14px, 1.6vw, 18px); margin-top: 22px;">No threshold beat excluding it. So it stopped deciding - and kept running in the background.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Not a tuning problem - no cutoff fixes a detector answering the wrong question.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 6px;">Benchmark instinct: does it agree with the frontier model. Metric that mattered: is it right against independent ground truth - and no threshold on the wrong prompt ever got there.</p>
-          <aside class="notes">Demoted. I tried every operating point in the sweep. Best case: one session out of three, correct. Excluding its output instead: two out of three, correct. That's what took it out of the verdict - it stopped being trusted alone, but it kept running. And this wasn't a tuning problem - no confidence cutoff fixes a detector that's answering the wrong question. The benchmark instinct here was agreement with the frontier model. The metric that actually mattered was correctness against independent ground truth - and once the prompt itself was pointed at the wrong region, no amount of threshold tuning was ever going to close that gap. What was missing wasn't a better threshold, it was judgment: something that could read the same evidence and reason about it, not just score it against a fixed number.</aside>
+          <aside class="notes"><strong>Not a tuning problem.</strong> Demoted. I tried every operating point in the sweep. Best case: one session out of three, correct. Excluding its output instead: two out of three, correct. That's what took it out of the verdict - it stopped being trusted alone, but it kept running. And this wasn't a tuning problem - no confidence cutoff fixes a detector that's answering the wrong question. My instinct going in was to check agreement with the frontier model. The metric that actually mattered was correctness against independent ground truth - and once the prompt itself was pointed at the wrong region, no amount of threshold tuning was ever going to close that gap. What was missing wasn't a better threshold, it was judgment: something that could read the same evidence and reason about it, not just score it against a fixed number.</aside>
         </section>
 
         <!-- 15. Third layer setup (plan #15) -->
         <section>
           <p class="eyebrow">Then a third layer</p>
-          <h2 class="big" style="font-size: clamp(28px, 4vw, 48px);">A Claude adjudicator,<br>over both.</h2>
+          <h2 class="big" style="font-size: clamp(28px, 4vw, 48px);">A Claude checker,<br>over both.</h2>
           <div class="arch" style="margin-top: 34px;">
             <div class="arch-node"><div class="an-label">Frontier model</div><div class="an-sub">cites frames</div></div>
             <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg></div>
-            <div class="arch-node accent"><div class="an-label">Claude adjudicator</div><div class="an-sub">checker, not detector -<br>downgrades, never upgrades</div></div>
+            <div class="arch-node accent"><div class="an-label">Claude checker</div><div class="an-sub">checks, doesn't detect -<br>downgrades, never upgrades</div></div>
             <div class="arch-arrow"><svg viewBox="0 0 42 14"><line x1="0" y1="7" x2="34" y2="7" stroke="#4a4d55" stroke-width="2"/><polygon points="34,2 42,7 34,12" fill="#4a4d55"/></svg></div>
             <div class="arch-node"><div class="an-label">Interface</div><div class="an-sub">what the user<br>sees</div></div>
           </div>
@@ -566,10 +603,10 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
           <div class="assets" style="margin-top: 18px;">
             <div class="asset"><code style="font-size: clamp(14px, 1.8vw, 22px); color: var(--dim);">132 calls</code><span class="what">about 17s each, ~$1.50 total for the session</span></div>
           </div>
-          <aside class="notes">So why an adjudicator, and why not from the start? An adjudicator here just means a checker, not a detector - it doesn't look at the footage itself, it looks at what the other two already said and decides whether that holds up. Why introduce it now: the frontier model alone couldn't be trusted, and SAM alone turned out to be a fixed-threshold detector with no way to reason about context - tuning it couldn't fix that. What was actually missing was judgment, applied after both cheaper layers had already run and shown their limits. Here's the part that actually made it work, and it's not the model - it's how it was run. This wasn't a single API call fed the whole clip. It was Claude Code, a coding agent, put in a sandbox with the frames themselves. That meant it could crop into a corner of the image, flip it, zoom in, rerun the same frame from a different angle - actually go look, the way a person reviewing footage would, instead of committing to one answer from one fixed view. That's the entire reason it beat a plain API call: not a bigger model, a model with hands. 132 calls, about 17 seconds each, about a dollar fifty for the session - cheap, given what it replaced. Its contract stayed disciplined throughout: allowed to downgrade severity, never to upgrade it.</aside>
+          <aside class="notes">So that's what got added: a third layer, sitting over both. A Claude checker - it doesn't look at the footage itself, it looks at what the other two already said and decides whether that holds up. Here's the part that actually made it work, and it's not the model - it's how it was run. This wasn't a single API call fed the whole clip. It was Claude Code, a coding agent, put in a sandbox with the frames themselves. That meant it could crop into a corner of the image, flip it, zoom in, rerun the same frame from a different angle - actually go look, the way a person reviewing footage would, instead of committing to one answer from one fixed view. That's the entire reason it beat a plain API call: not a bigger model, a model with hands. 132 calls, about 17 seconds each, about a dollar fifty for the session - cheap, given what it replaced. Its contract stayed disciplined throughout: allowed to downgrade severity, never to upgrade it.</aside>
         </section>
 
-        <!-- 16. The canonical win that wasn't (plan #16) -->
+        <!-- 16. The canonical win that wasn't -> punchline (merged: former 16+17) -->
         <section>
           <p class="eyebrow">The canonical win, written up that same evening</p>
           <div class="compare2">
@@ -584,15 +621,9 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
               <div class="cnote">Timestamp claims must return unverifiable absent a burnt-in clock - rule 3 names <span class="cyan">00:25:00</span> as its own example.</div>
             </div>
           </div>
-          <p class="caption">The verdict was fixed before the model saw a pixel.</p>
-          <aside class="notes">Its canonical win, written up the same evening, was catching a hallucinated conveyor timestamp of 00:25:00. Except 00:25:00 was correct - confirmed by SME ground truth, recorded independently. And the verifier had a rule stating timestamp claims must be returned unverifiable unless a clock is burnt into the frame, using this exact timestamp as its own worked example. The verdict was fixed before the model saw a pixel, and so was the sentence announcing it.</aside>
-        </section>
-
-        <!-- 17. Punchline (plan #17) -->
-        <section>
-          <h2 class="big">A rule-produced category<br>got read as <span class="up">a finding</span>.</h2>
-          <p class="sub">"Could not be confirmed" - read as <span class="up">"caught."</span></p>
-          <aside class="notes">A three-valued verifier had been collapsed to two values by the humans reading it, and "could not confirm" got filed as "caught." A category produced by rule rather than evidence is a constant. And a constant read as a signal is the purest way to measure nothing while feeling well-instrumented.</aside>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-top: 24px;">A rule-produced category<br>got read as <span class="up">a finding</span>.</h2>
+          <p class="caption">The verdict was fixed before the model saw a pixel - "could not be confirmed" got filed as <span class="up">"caught."</span></p>
+          <aside class="notes"><strong>The catch that wasn't.</strong> The canonical win that evening was catching a hallucinated timestamp - 00:25:00. Looked closer: it was correct, confirmed by independent SME ground truth. The verifier's own rule says no burnt-in clock, no confirmed timestamp - no exceptions, it even uses this exact timestamp as its example. So the verdict was fixed before the model saw a frame, and we read "could not confirm" as "caught it." A rule-produced answer is a constant - and reading a constant as a signal is how you feel well-instrumented while measuring nothing.</aside>
         </section>
 
         <!-- 18. The pattern across all three (plan #18) -->
@@ -664,7 +695,7 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             >
             <p class="caption" style="font-size: clamp(12px, 1.3vw, 15px); text-align: left; margin: 0; max-width: 420px;">Scan to try it live - edit the text, watch recall move while CER doesn't.</p>
           </div>
-          <aside class="notes">This is a small, runnable artifact - metric_blindspot.py, in the repo, no dependencies, no network, no model. Not running it live on stage, but that QR takes you to a page that runs the identical check live in your own browser right now - edit the truth or OCR text and watch identifier recall collapse while CER barely moves. The gold sliver is the identifier characters: 0.86 percent of the page. Compute identifier_chars over total_chars on your own corpus, and you have this bound before you run anything.</aside>
+          <aside class="notes"><strong>The bound, live in your browser.</strong> So this is a small runnable artifact - a script in the repo, no dependencies, no model, nothing fancy behind it. I'm not running it live on stage, but that QR takes you straight to it, in your own browser, right now. There's no run button - just start typing in either box and it recalculates as you go. Try deleting one of the question numbers and watch identifier recall drop while the error rate barely moves. That gap you're seeing, 0.86 percent of the page - that's the same ratio you can compute on your own corpus, before you run anything.</aside>
         </section>
 
         <!-- 21. Takeaways (plan #21) - the one slide allowed bullets, lifted from abstract.md -->
@@ -687,14 +718,14 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
               "Unverifiable by policy" filed as "caught a hallucination."
             </p>
           </div>
-          <aside class="notes">Picking the number before you benchmark is the baseline - you already know that one. Two things past it. One: the model was rarely the actual lever. Ten OCR engines spanned about two points of accuracy - one font-table fix moved Hindi misread three to four times, on all ten engines, at once. Half of this talk was a model comparison. Check whether the leverage is even in the model before you spend that effort on the comparison. Two: a verifier's most confident-looking catch can be its own rule firing, not a finding - "unverifiable by policy" got filed by a person as "caught a hallucination," on a timestamp that was actually correct. If you're stacking a verifier on a verifier - which is exactly what an agent harness is - the cleanest, most reassuring-looking catch is the one most worth doubting.</aside>
+          <aside class="notes"><strong>Two things, past the obvious one.</strong> Picking the number before you benchmark - that's the baseline, you already know that one. Two things past it. One: the model was rarely the actual lever. Ten OCR engines, about two points of accuracy apart - one font-table fix moved Hindi misread three to four times, on all ten engines, at once. Half of this talk was a model comparison. Check whether the leverage is even in the model before you spend that effort on the comparison. Two: a verifier's most confident-looking catch can be its own rule firing, not a finding. "Unverifiable by policy" got filed as "caught a hallucination" - on a timestamp that was actually correct. If you're stacking a verifier on a verifier, which is exactly what an agent harness is, the cleanest, most reassuring-looking catch is the one most worth doubting.</aside>
         </section>
 
         <!-- 22. Close (plan #22) -->
         <section>
           <h2 class="big">Good enough <span class="accent">for what?</span></h2>
           <p class="sub">Ask what would make you reject it, and what would make you accept it - before you run the benchmark that tells you to keep it.</p>
-          <aside class="notes">So back to the title. Good enough for what. Ask what would make you reject it - and ask what would make you accept it - before you run the benchmark that tells you to keep it. Thank you.</aside>
+          <aside class="notes"><strong>Back to the title.</strong> So, back to the title - good enough for what. Ask what would make you reject it. Ask what would make you accept it. Do that before you run the benchmark that's going to tell you to keep it anyway. Thank you.</aside>
         </section>
 
         <!-- 23. Connect (plan #23, added on reviewer feedback) -->
