@@ -498,7 +498,7 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             <span class="source"><span class="dot"></span>TimeLens-Bench, arXiv 2512.14698</span>
             <span class="source"><span class="dot"></span>Meta AI, arXiv 2511.16719</span>
           </div>
-          <aside class="notes">Before I built anything, there were two public numbers worth knowing, and together they're why the pattern going in was frontier proposes, small model verifies - not either one alone. First: even a frontier model like Gemini-2.5-Pro misses on a meaningful share of cases on TimeLens-Bench, a benchmark built for exactly this skill - can a model say when something happened, not just what happened. That's not the benchmark this pipeline was measured on, it's the closest public analog I could verify, and it matched what I'd already seen running it myself - drifting on timestamps, not just missing the window entirely. Second: SAM itself has a real public number too. On Meta's own benchmark, SAM 3 scores 54.1, more than double the best prior system at 24.6 - a real, respectable result. But neither of these numbers ever asked whether a conveyor is extended into a trailer. Nobody publishes that benchmark - it's the client's own rule. So what I'm about to walk through isn't a surprise that a verifier was needed, and it isn't a case where SAM was secretly bad at a known skill. It's a surprise about which layer actually failed, on a question no public benchmark was ever going to ask.</aside>
+          <aside class="notes"><strong>Two numbers, not our number.</strong> Before I built anything, two public numbers set the pattern - frontier proposes, small model verifies. Frontier models miss on TimeLens-Bench, saying when something happened, not just what - and I'm not naming which one we actually run, so take Gemini-2.5-Pro as just a stand-in. SAM's got a real number too, 54.1, more than double the old best at 24.6 - but neither number ever asked if a conveyor's extended into a trailer, and nobody benchmarks that, it's the client's own rule. So this isn't "we needed a verifier" as a surprise, and it's not "SAM was bad" - it's about which layer actually failed, on a question no benchmark was ever built to ask.</aside>
         </section>
 
         <!-- 11d. So here's the pattern I built: SAM 3.1 (formerly plan #11) -->
@@ -514,12 +514,12 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
             <div class="arch-node"><div class="an-label">Interface</div><div class="an-sub">shows only what's<br>defended</div></div>
           </div>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 10px;">Self-hosted, because the footage can't leave the client's infrastructure. And to be precise: SAM 3.1 is a speed and video-tracking patch on SAM 3, not a re-benchmark of that 54.1 figure.</p>
-          <aside class="notes">So, given those two public numbers, here's the pattern I actually built - and to be precise about which model earned that SAM number, SAM 3.1 running here is a follow-up patch on speed and video tracking, not a re-statement of that same figure. The frontier model reads the footage and grades compliance against the client's rulebook, citing the frames it's basing that grade on. And SAM 3.1, self-hosted on one workstation GPU, cross-checks every frame it cited before anything reaches a person - not as a detector deciding what's in the scene, as a validator checking the frontier model's claim. Same rule as the other two cases: used exactly as downloaded, no fine-tuning - I wasn't training a detector for this. Frontier proposes, small model verifies. It's a good pattern. I still believe in it.</aside>
+          <aside class="notes">So, given those two public numbers, here's the pattern I actually built - we used SAM 3.1 here, as verifier. The frontier model reads the footage and grades compliance against the client's rulebook, citing the frames it's basing that grade on. And SAM 3.1, self-hosted on one workstation GPU, cross-checks every frame it cited before anything reaches a person - not as a detector deciding what's in the scene, as a validator checking the frontier model's claim. I wasn't training a detector for this. Frontier proposes, small model verifies. It's a good pattern. I still believe in it.</aside>
         </section>
 
         <!-- 12. Measured three ways, lost all three (plan #12) -->
         <section>
-          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 4px;">Measured three ways.<br>Lost all three.</h2>
+          <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-bottom: 4px;">Measured three ways.<br>Right on one of three.</h2>
           <p class="caption" style="margin-top: 4px; margin-bottom: 2px; font-size: clamp(14px, 1.6vw, 19px); color: var(--dim);">disagreed with the frontier model, 38 of 65 scored checks - it could only ask for "conveyor," never "extended into the trailer"</p>
           <div class="prop-bar">
             <div class="seg" style="left: 0; width: 58.5%; background: var(--up);"></div>
@@ -536,9 +536,9 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
               <div class="cvalue" style="font-size: clamp(20px, 2.6vw, 28px); color: var(--up);">25 minutes in</div>
             </div>
           </div>
-          <p class="caption" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 8px;">Worst of three sessions on conveyor timing - wrong on all three, off by up to 25 minutes into the recording.</p>
+          <p class="caption" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); margin-top: 8px;">Worst of three sessions on conveyor timing - right on one, off by up to 25 minutes on the other two.</p>
           <p class="sub" style="font-size: clamp(13px, 1.5vw, 16px); color: var(--dim); font-style: italic; margin-top: 8px;">Agreeing with the frontier model isn't the same question as being right.</p>
-          <aside class="notes">I measured it three ways, and first it disagreed with the frontier model on 38 of 65 scored checks. But looking closer, most of that wasn't a real disagreement - it was a mismatch. SAM takes object names, not relations. I could tell it to look for a conveyor. I couldn't tell it to look for a conveyor extended into the trailer. So it was answering a narrower question than the rule actually asked, and agreeing with the frontier model never surfaced that. Against human ground truth on conveyor timing, it was wrong on all three sessions - the worst miss by 25 minutes.</aside>
+          <aside class="notes">I measured it three ways, and first it disagreed with the frontier model on 38 of 65 scored checks. But looking closer, most of that wasn't a real disagreement - it was a mismatch. SAM takes object names, not relations. I could tell it to look for a conveyor. I couldn't tell it to look for a conveyor extended into the trailer. So it was answering a narrower question than the rule actually asked, and agreeing with the frontier model never surfaced that. Against human ground truth on conveyor timing, it got one of three sessions right - the other two were off, worst miss by 25 minutes.</aside>
         </section>
 
         <!-- 13. Threshold sweep (plan #13) -->
@@ -623,7 +623,7 @@ hosted model&nbsp;&nbsp;&nbsp;<span class="c1">-></span>&nbsp;&nbsp;&nbsp;<span 
           </div>
           <h2 class="big" style="font-size: clamp(26px, 3.6vw, 42px); margin-top: 24px;">A rule-produced category<br>got read as <span class="up">a finding</span>.</h2>
           <p class="caption">The verdict was fixed before the model saw a pixel - "could not be confirmed" got filed as <span class="up">"caught."</span></p>
-          <aside class="notes"><strong>The catch that wasn't.</strong> The canonical win that evening was catching a hallucinated timestamp - 00:25:00. Looked closer: it was correct, confirmed by independent SME ground truth. The verifier's own rule says no burnt-in clock, no confirmed timestamp - no exceptions, it even uses this exact timestamp as its example. So the verdict was fixed before the model saw a frame, and we read "could not confirm" as "caught it." A rule-produced answer is a constant - and reading a constant as a signal is how you feel well-instrumented while measuring nothing.</aside>
+          <aside class="notes"><strong>The catch that wasn't.</strong> We thought the verifier had smartly caught a hallucination, but its rule guarantees "could not confirm" for that exact case regardless of whether the timestamp is right - so what looked like a signal was actually a fixed, rule-mandated output, not a real catch.</aside>
         </section>
 
         <!-- 18. The pattern across all three (plan #18) -->
