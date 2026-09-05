@@ -1,12 +1,12 @@
 # Good Enough for What?
 
-**The Fifth Elephant - TBD**
+**The Fifth Elephant - Sep 5, 2026**
 
 Three small models I had to judge this year, and the one question that decided all three - why public benchmarks aren't the same as your task's metric.
 
 - **Slides:** [View Presentation](https://prudhvi1709.github.io/talks/fifthel-05-09-2026/index.html)
-- **Video:** Not available yet
-- **Transcript:** Not available yet
+- **Video:** [Watch](https://www.youtube.com/watch?v=EMhR0MMs33c&t=3564s)
+- **Transcript:** [Read](transcript.md)
 - **Try it live:** [interactive.html](https://prudhvi1709.github.io/talks/fifthel-05-09-2026/artifact/interactive.html) - runs the talk's core check (identifier recall vs. character-error-rate) on your own text, right in the browser.
 
 Built with [Reveal.js](https://revealjs.com/) (vendored locally, so it runs fully offline).
